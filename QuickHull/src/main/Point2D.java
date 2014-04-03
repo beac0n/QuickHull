@@ -1,5 +1,12 @@
 package main;
 
+/**
+ * Diese Klasse soll einen Punkt im zweidimensionalen Raum darstellen.
+ * Die z-Achse ist hierbei immer 1
+ * 
+ * @author Maximilian Schempp
+ *
+ */
 public class Point2D implements Point {
 
 	private double x;

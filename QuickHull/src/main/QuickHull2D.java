@@ -6,9 +6,8 @@ import java.util.List;
 
 
 /**
- * Klasse, welche das berechnen der Randpunkte einer Punktwolke im 
- * 2-Dimensionalen Raum kapselt und gegenbenenfalls das 
- * ganze graphisch darstellt.
+ * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im 
+ * 2-Dimensionalen Raum kapselt
  * 
  * @author Maximilian Schempp
  *

@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class QuickHull3DTest extends QuickHullTest {
 
-	private static int pointCap = 50000;
+	private static int pointCap = 10000;
 	private static int pointCapHalf = pointCap/2;
 
 	@Test
@@ -138,7 +138,6 @@ public class QuickHull3DTest extends QuickHullTest {
 		QuickHull3D qh3d = new QuickHull3D();
 		
 		List<Point> borderPoints = qh3d.getBorderPoints(pointList);
-	//= getBorderAndWriteToFile(pointList, "testBestCase3D");
 		
 		assertEquals(8, borderPoints.size());
 		assertTrue(borderPoints.contains(a));

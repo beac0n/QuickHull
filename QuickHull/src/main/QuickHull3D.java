@@ -6,15 +6,28 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im 
+ * 3-Dimensionalen Raum kapselt
+ * 
+ * @author Maximilian Schempp
+ *
+ */
 public class QuickHull3D extends QuickHull {
 
+	/**
+	 * Liefert für eine gegebene Liste an Punkten
+	 * alle Randpunkte.
+	 * 
+	 * @param pointSetInput Die Liste der gegebenen Punkte
+	 * @return eine Liste der Randpunkte
+	 */
 	public List<Point> getBorderPoints(List<Point> pointSetInput) {
 
 		if (pointSetInput.size() < 5)
 			return pointSetInput;
 
 		List<Point> pointSet = new ArrayList<Point>(pointSetInput);
-		printCurrententPoints(pointSet);
 
 		List<Point> borderPoints = new LinkedList<Point>();
 
@@ -24,10 +37,6 @@ public class QuickHull3D extends QuickHull {
 
 		pointSet.removeAll(initHull);		
 
-		printShape(initHull.get(2), initHull.get(1), initHull.get(0));
-		printShape(initHull.get(1), initHull.get(3), initHull.get(0));
-		printShape(initHull.get(3), initHull.get(2), initHull.get(0));
-		printShape(initHull.get(2), initHull.get(3), initHull.get(1));
 
 		List<Point> behindSet = getAllPointsOver(initHull.get(2), initHull.get(1), initHull.get(0), pointSet);
 		pointSet.removeAll(behindSet);
@@ -46,6 +55,13 @@ public class QuickHull3D extends QuickHull {
 		return borderPoints;
 	}
 
+	/**
+	 * Bestimmt die ersten 4 Punkte welche benötigt werden um den
+	 * Quckhull Algorithmus im dreidimensionalen Raum auszuführen.
+	 * 
+	 * @param pointSet Liste von Punkten, aus welchen später die konvexen Hüllenpunkte berechnet werden.
+	 * @return Liste mit den ersten 4 Randpunkten
+	 */
 	private List<Point> getInitialhull(List<Point> pointSet) {
 
 		// bestimmte die zwei am weitesten entfernten punkte
@@ -118,6 +134,16 @@ public class QuickHull3D extends QuickHull {
 		return returnValue;
 	}
 
+	/**
+	 * berechnet den Punkt der am weitesten von der Ebene entfernt ist,
+	 * welche durch die drei punkte maxfirst maxsecond maxdistPointLine bestimmt wird.
+	 * 
+	 * @param pointSet die Liste von Punkten die existieren
+	 * @param maxfirst der erste Punkt der Ebene
+	 * @param maxsecond der zweite Punkt der Ebene
+	 * @param maxdistPointLine der dritte Punkt der Ebene
+	 * @return der Punkt der am weitesten von der Ebene entfernt ist
+	 */
 	private Point getMaxDistantPointFromPlane(List<Point> pointSet,
 			Point maxfirst, Point maxsecond, Point maxdistPointLine) {
 		Iterator<Point> iter;
@@ -140,6 +166,15 @@ public class QuickHull3D extends QuickHull {
 		return maxdistPointPlane;
 	}
 
+	/**
+	 * berechnet den Punkt der am weitesten von der Geraden entfernt ist,
+	 * welche durch die zwei punkte maxfirst und maxsecond bestimmt wird.
+	 * 
+	 * @param pointSet Liste der Punkte
+	 * @param maxfirst erster Punkt der Geraden
+	 * @param maxsecond zweiter Punkt der Geraden
+	 * @return der Punkt der am weitesten von der Geraden entfernt ist
+	 */
 	private Point getMaxDistantPointFromLine(List<Point> pointSet,
 			Point maxfirst, Point maxsecond) {
 		// determinantenform: u x (x-p) = 0
@@ -166,6 +201,16 @@ public class QuickHull3D extends QuickHull {
 		return maxdistPointLine;
 	}
 
+	/**
+	 * Bestimmt ein Maß des Abstand eines Punktes von einer Geraden.
+	 * Hierbei handelt es sich nicht um den genauen Abstand, da der Wert
+	 * nur zum Vergleich benötigt wird.
+	 * 
+	 * @param u der Richtungsvektor der Geraden
+	 * @param p ein Stüztvektor
+	 * @param x der zu prüfende Punkt
+	 * @return ein Maß für den Abstand der Punktes zur Geraden
+	 */
 	private double getDistanceFromLine(Point u, Point p, Point x) {
 		// determinantenform: u x (x-p) = 0
 
@@ -212,10 +257,6 @@ public class QuickHull3D extends QuickHull {
 		pointSet.remove(uppestPoint);
 		borderPoints.add(uppestPoint);
 
-		printShape(uppestPoint, farSidePoint, leftSidePoint);
-		printShape(leftSidePoint, rightSidePoint, uppestPoint);
-		printShape(rightSidePoint, farSidePoint, uppestPoint);
-
 		List<Point> rightUpperSet = getAllPointsOver(uppestPoint, farSidePoint, leftSidePoint, pointSet);
 		pointSet.removeAll(rightUpperSet);
 		List<Point> leftUpperSet = getAllPointsOver(leftSidePoint, rightSidePoint, uppestPoint, pointSet);
@@ -228,6 +269,15 @@ public class QuickHull3D extends QuickHull {
 		calculateBorder(rightSidePoint, farSidePoint, uppestPoint, farUpperSet,	borderPoints);
 	}
 
+	/**
+	 * Bestimmt den Punkt der am weitesten oberhalb einer Ebene liegt.
+	 * 
+	 * @param leftSidePoint erster Punkt der Ebene
+	 * @param rightSidePoint zweiter Punkt der Ebene
+	 * @param farSidePoint dritter Punkt der Ebene
+	 * @param currentPointSet Liste von Punkten
+	 * @return der Punkt der am weitesten oberhalb der Ebene liegt
+	 */
 	private Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
 			Point farSidePoint, List<Point> currentPointSet) {
 
@@ -251,6 +301,15 @@ public class QuickHull3D extends QuickHull {
 		return uppestPoint;
 	}
 
+	/**
+	 * Bestimmt alle Punkte oberhalb einer Ebene
+	 * 
+	 * @param leftSidePoint der erste Punkt der Ebene
+	 * @param rightSidePoint der zweite Punkt der Ebene
+	 * @param farSidePoint der dritte Punkt der Ebene
+	 * @param upperSet die Punktmenge aus der die Punkte zu bestimmen sind
+	 * @return die Punkte oberhalb der Ebene
+	 */
 	private List<Point> getAllPointsOver(Point leftSidePoint,
 			Point rightSidePoint, Point farSidePoint, List<Point> upperSet) {
 
@@ -321,109 +380,5 @@ public class QuickHull3D extends QuickHull {
 		double end = endX + endY + endZ;
 
 		return end;
-
 	}
-
-	boolean enabled = false;
-
-	private void printCurrententPoints(List<Point> points) {
-		if (enabled) {
-			System.out
-					.print("<Shape><Appearance><Material emissiveColor='1 1 1'/> </Appearance>"
-							+ "<PointSet><Coordinate point='");
-
-			Iterator<Point> iter = points.iterator();
-
-			while (iter.hasNext()) {
-				Point cur = iter.next();
-				System.out.println(cur.getX() + " " + cur.getY() + " "
-						+ cur.getZ() + " ");
-			}
-
-			System.out.println("'/></PointSet></Shape>");
-		}
-	}
-
-	private void printShape(Point a, Point b, Point c) {
-
-		if (enabled) {
-			double randColorR = (Math.random());
-			double randColorG = (Math.random());
-			double randColorB = (Math.random());
-
-			System.out.println("<Shape><IndexedFaceSet coordIndex='0 1 2'>"
-					+ "<Color color='" + randColorR + " " + randColorG + " "
-					+ randColorB + " " + randColorR + " " + randColorG + " "
-					+ randColorB + " " + randColorR + " " + randColorG + " "
-					+ randColorB + "'/>" + "<Coordinate point='");
-			System.out
-					.println(a.getX() + " " + a.getY() + " " + a.getZ() + " ");
-			System.out
-					.println(b.getX() + " " + b.getY() + " " + b.getZ() + " ");
-			System.out.println(c.getX() + " " + c.getY() + " " + c.getZ());
-			System.out.println("'/></IndexedFaceSet></Shape>");
-			System.out.println();
-		}
-	}
-
-	private Point getFarSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point farSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getZ() > farSidePoint.getZ()) {
-				farSidePoint = curr;
-			}
-		}
-
-		return farSidePoint;
-	}
-
-	private Point getNearSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point nearSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getZ() < nearSidePoint.getZ()) {
-				nearSidePoint = curr;
-			}
-		}
-
-		return nearSidePoint;
-	}
-
-	private Point getTopSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point topSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getY() > topSidePoint.getY()) {
-				topSidePoint = curr;
-			}
-		}
-
-		return topSidePoint;
-	}
-
-	private Point getLowSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point lowSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getY() < lowSidePoint.getY()) {
-				lowSidePoint = curr;
-			}
-		}
-
-		return lowSidePoint;
-	}
-
 }

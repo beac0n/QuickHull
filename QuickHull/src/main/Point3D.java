@@ -1,5 +1,12 @@
 package main;
 
+
+/**
+ * Diese Klasse stellt einen Punkt im dreidimensionalen Raum dar
+ * 
+ * @author Maximilian Schempp
+ *
+ */
 public class Point3D implements Point {
 
 	private double x;
