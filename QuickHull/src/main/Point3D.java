@@ -1,11 +1,10 @@
 package main;
 
-
 /**
  * Diese Klasse stellt einen Punkt im dreidimensionalen Raum dar
  * 
  * @author Maximilian Schempp
- *
+ * 
  */
 public class Point3D implements Point {
 
@@ -18,7 +17,7 @@ public class Point3D implements Point {
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	@Override
 	public double getX() {
 		return x;
@@ -32,6 +31,15 @@ public class Point3D implements Point {
 	@Override
 	public double getZ() {
 		return z;
+	}
+
+	public int hashCode() {
+		return Double.valueOf(x).hashCode();
+	}
+
+	public boolean equals(Object obj) {
+		Point p = (Point) obj;
+		return (getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ());
 	}
 
 }
