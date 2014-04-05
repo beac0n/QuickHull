@@ -7,19 +7,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im 
+ * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im
  * 3-Dimensionalen Raum kapselt
  * 
  * @author Maximilian Schempp
- *
+ * 
  */
 public class QuickHull3D extends QuickHull {
 
 	/**
-	 * Liefert für eine gegebene Liste an Punkten
-	 * alle Randpunkte.
+	 * Liefert für eine gegebene Liste an Punkten alle Randpunkte.
 	 * 
-	 * @param pointSetInput Die Liste der gegebenen Punkte
+	 * @param pointSetInput
+	 *            Die Liste der gegebenen Punkte
 	 * @return eine Liste der Randpunkte
 	 */
 	public List<Point> getBorderPoints(List<Point> pointSetInput) {
@@ -35,31 +35,40 @@ public class QuickHull3D extends QuickHull {
 
 		borderPoints.addAll(initHull);
 
-		pointSet.removeAll(initHull);		
+		pointSet.removeAll(initHull);
 
-
-		List<Point> behindSet = getAllPointsOver(initHull.get(2), initHull.get(1), initHull.get(0), pointSet);
+		List<Point> behindSet = getAllPointsOver(initHull.get(2),
+				initHull.get(1), initHull.get(0), pointSet);
 		pointSet.removeAll(behindSet);
-		List<Point> rightSet = getAllPointsOver(initHull.get(1), initHull.get(3), initHull.get(0), pointSet);
+		List<Point> rightSet = getAllPointsOver(initHull.get(1),
+				initHull.get(3), initHull.get(0), pointSet);
 		pointSet.removeAll(rightSet);
-		List<Point> leftSet = getAllPointsOver(initHull.get(3), initHull.get(2), initHull.get(0), pointSet);
+		List<Point> leftSet = getAllPointsOver(initHull.get(3),
+				initHull.get(2), initHull.get(0), pointSet);
 		pointSet.removeAll(leftSet);
-		List<Point> lowerSet = getAllPointsOver(initHull.get(2), initHull.get(3), initHull.get(1), pointSet);
+		List<Point> lowerSet = getAllPointsOver(initHull.get(2),
+				initHull.get(3), initHull.get(1), pointSet);
 		pointSet.removeAll(lowerSet);
 
-		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0), behindSet, borderPoints);
-		calculateBorder(initHull.get(1), initHull.get(3), initHull.get(0), rightSet, borderPoints);
-		calculateBorder(initHull.get(3), initHull.get(2), initHull.get(0), leftSet, borderPoints);
-		calculateBorder(initHull.get(2), initHull.get(3), initHull.get(1), lowerSet, borderPoints);
+		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0),
+				behindSet, borderPoints);
+		calculateBorder(initHull.get(1), initHull.get(3), initHull.get(0),
+				rightSet, borderPoints);
+		calculateBorder(initHull.get(3), initHull.get(2), initHull.get(0),
+				leftSet, borderPoints);
+		calculateBorder(initHull.get(2), initHull.get(3), initHull.get(1),
+				lowerSet, borderPoints);
 
 		return borderPoints;
 	}
 
 	/**
-	 * Bestimmt die ersten 4 Punkte welche benötigt werden um den
-	 * Quckhull Algorithmus im dreidimensionalen Raum auszuführen.
+	 * Bestimmt die ersten 4 Punkte welche benötigt werden um den Quckhull
+	 * Algorithmus im dreidimensionalen Raum auszuführen.
 	 * 
-	 * @param pointSet Liste von Punkten, aus welchen später die konvexen Hüllenpunkte berechnet werden.
+	 * @param pointSet
+	 *            Liste von Punkten, aus welchen später die konvexen
+	 *            Hüllenpunkte berechnet werden.
 	 * @return Liste mit den ersten 4 Randpunkten
 	 */
 	private List<Point> getInitialhull(List<Point> pointSet) {
@@ -115,16 +124,18 @@ public class QuickHull3D extends QuickHull {
 			maxfirst = far;
 			maxsecond = near;
 		}
-		
+
 		pointSet.remove(maxfirst);
 		pointSet.remove(maxsecond);
 
-		Point maxdistPointLine = getMaxDistantPointFromLine(pointSet, maxfirst, maxsecond);
+		Point maxdistPointLine = getMaxDistantPointFromLine(pointSet, maxfirst,
+				maxsecond);
 		pointSet.remove(maxdistPointLine);
-		
-		Point maxdistPointPlane = getMaxDistantPointFromPlane(pointSet, maxfirst, maxsecond, maxdistPointLine);
+
+		Point maxdistPointPlane = getMaxDistantPointFromPlane(pointSet,
+				maxfirst, maxsecond, maxdistPointLine);
 		pointSet.remove(maxdistPointPlane);
-		
+
 		List<Point> returnValue = new LinkedList<Point>();
 		returnValue.add(maxfirst);
 		returnValue.add(maxsecond);
@@ -135,13 +146,17 @@ public class QuickHull3D extends QuickHull {
 	}
 
 	/**
-	 * berechnet den Punkt der am weitesten von der Ebene entfernt ist,
-	 * welche durch die drei punkte maxfirst maxsecond maxdistPointLine bestimmt wird.
+	 * berechnet den Punkt der am weitesten von der Ebene entfernt ist, welche
+	 * durch die drei punkte maxfirst maxsecond maxdistPointLine bestimmt wird.
 	 * 
-	 * @param pointSet die Liste von Punkten die existieren
-	 * @param maxfirst der erste Punkt der Ebene
-	 * @param maxsecond der zweite Punkt der Ebene
-	 * @param maxdistPointLine der dritte Punkt der Ebene
+	 * @param pointSet
+	 *            die Liste von Punkten die existieren
+	 * @param maxfirst
+	 *            der erste Punkt der Ebene
+	 * @param maxsecond
+	 *            der zweite Punkt der Ebene
+	 * @param maxdistPointLine
+	 *            der dritte Punkt der Ebene
 	 * @return der Punkt der am weitesten von der Ebene entfernt ist
 	 */
 	private Point getMaxDistantPointFromPlane(List<Point> pointSet,
@@ -167,12 +182,15 @@ public class QuickHull3D extends QuickHull {
 	}
 
 	/**
-	 * berechnet den Punkt der am weitesten von der Geraden entfernt ist,
-	 * welche durch die zwei punkte maxfirst und maxsecond bestimmt wird.
+	 * berechnet den Punkt der am weitesten von der Geraden entfernt ist, welche
+	 * durch die zwei punkte maxfirst und maxsecond bestimmt wird.
 	 * 
-	 * @param pointSet Liste der Punkte
-	 * @param maxfirst erster Punkt der Geraden
-	 * @param maxsecond zweiter Punkt der Geraden
+	 * @param pointSet
+	 *            Liste der Punkte
+	 * @param maxfirst
+	 *            erster Punkt der Geraden
+	 * @param maxsecond
+	 *            zweiter Punkt der Geraden
 	 * @return der Punkt der am weitesten von der Geraden entfernt ist
 	 */
 	private Point getMaxDistantPointFromLine(List<Point> pointSet,
@@ -202,13 +220,16 @@ public class QuickHull3D extends QuickHull {
 	}
 
 	/**
-	 * Bestimmt ein Maß des Abstand eines Punktes von einer Geraden.
-	 * Hierbei handelt es sich nicht um den genauen Abstand, da der Wert
-	 * nur zum Vergleich benötigt wird.
+	 * Bestimmt ein Maß des Abstand eines Punktes von einer Geraden. Hierbei
+	 * handelt es sich nicht um den genauen Abstand, da der Wert nur zum
+	 * Vergleich benötigt wird.
 	 * 
-	 * @param u der Richtungsvektor der Geraden
-	 * @param p ein Stüztvektor
-	 * @param x der zu prüfende Punkt
+	 * @param u
+	 *            der Richtungsvektor der Geraden
+	 * @param p
+	 *            ein Stüztvektor
+	 * @param x
+	 *            der zu prüfende Punkt
 	 * @return ein Maß für den Abstand der Punktes zur Geraden
 	 */
 	private double getDistanceFromLine(Point u, Point p, Point x) {
@@ -247,35 +268,47 @@ public class QuickHull3D extends QuickHull {
 	protected void calculateBorder(Point leftSidePoint, Point rightSidePoint,
 			Point farSidePoint, List<Point> pointSet, List<Point> borderPoints) {
 
-		if (pointSet.size() == 0) return;
+		if (pointSet.size() == 0)
+			return;
 
 		Point uppestPoint = getUppestPoint(leftSidePoint, rightSidePoint,
 				farSidePoint, pointSet);
 
-		if (uppestPoint == null) return;
+		if (uppestPoint == null)
+			return;
 
 		pointSet.remove(uppestPoint);
 		borderPoints.add(uppestPoint);
 
-		List<Point> rightUpperSet = getAllPointsOver(uppestPoint, farSidePoint, leftSidePoint, pointSet);
+		List<Point> rightUpperSet = getAllPointsOver(uppestPoint, farSidePoint,
+				leftSidePoint, pointSet);
 		pointSet.removeAll(rightUpperSet);
-		List<Point> leftUpperSet = getAllPointsOver(leftSidePoint, rightSidePoint, uppestPoint, pointSet);
+		List<Point> leftUpperSet = getAllPointsOver(leftSidePoint,
+				rightSidePoint, uppestPoint, pointSet);
 		pointSet.removeAll(leftUpperSet);
-		List<Point> farUpperSet = getAllPointsOver(rightSidePoint, farSidePoint, uppestPoint, pointSet);
+		List<Point> farUpperSet = getAllPointsOver(rightSidePoint,
+				farSidePoint, uppestPoint, pointSet);
 		pointSet.removeAll(farUpperSet);
 
-		calculateBorder(uppestPoint, farSidePoint, leftSidePoint, rightUpperSet, borderPoints);
-		calculateBorder(leftSidePoint, rightSidePoint, uppestPoint,	leftUpperSet, borderPoints);
-		calculateBorder(rightSidePoint, farSidePoint, uppestPoint, farUpperSet,	borderPoints);
+		calculateBorder(uppestPoint, farSidePoint, leftSidePoint,
+				rightUpperSet, borderPoints);
+		calculateBorder(leftSidePoint, rightSidePoint, uppestPoint,
+				leftUpperSet, borderPoints);
+		calculateBorder(rightSidePoint, farSidePoint, uppestPoint, farUpperSet,
+				borderPoints);
 	}
 
 	/**
 	 * Bestimmt den Punkt der am weitesten oberhalb einer Ebene liegt.
 	 * 
-	 * @param leftSidePoint erster Punkt der Ebene
-	 * @param rightSidePoint zweiter Punkt der Ebene
-	 * @param farSidePoint dritter Punkt der Ebene
-	 * @param currentPointSet Liste von Punkten
+	 * @param leftSidePoint
+	 *            erster Punkt der Ebene
+	 * @param rightSidePoint
+	 *            zweiter Punkt der Ebene
+	 * @param farSidePoint
+	 *            dritter Punkt der Ebene
+	 * @param currentPointSet
+	 *            Liste von Punkten
 	 * @return der Punkt der am weitesten oberhalb der Ebene liegt
 	 */
 	private Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
@@ -304,10 +337,14 @@ public class QuickHull3D extends QuickHull {
 	/**
 	 * Bestimmt alle Punkte oberhalb einer Ebene
 	 * 
-	 * @param leftSidePoint der erste Punkt der Ebene
-	 * @param rightSidePoint der zweite Punkt der Ebene
-	 * @param farSidePoint der dritte Punkt der Ebene
-	 * @param upperSet die Punktmenge aus der die Punkte zu bestimmen sind
+	 * @param leftSidePoint
+	 *            der erste Punkt der Ebene
+	 * @param rightSidePoint
+	 *            der zweite Punkt der Ebene
+	 * @param farSidePoint
+	 *            der dritte Punkt der Ebene
+	 * @param upperSet
+	 *            die Punktmenge aus der die Punkte zu bestimmen sind
 	 * @return die Punkte oberhalb der Ebene
 	 */
 	private List<Point> getAllPointsOver(Point leftSidePoint,

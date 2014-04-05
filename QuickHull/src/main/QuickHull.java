@@ -4,18 +4,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Abstrakte Klasse die einige Methoden für alle QuickHull implementierungen bereitstellt,
- * sowie die Methode getBorderPoints definiert, welche die Punkte berechnet, welche die
- * konvexe Hülle der Punkte darstellt
+ * Abstrakte Klasse die einige Methoden für alle QuickHull implementierungen
+ * bereitstellt, sowie die Methode getBorderPoints definiert, welche die Punkte
+ * berechnet, welche die konvexe Hülle der Punkte darstellt
  * 
  * @author Maximilian Schempp
- *
+ * 
  */
 public abstract class QuickHull {
-	
+
 	/**
-	 * Berechnet die Punkte der konvexen Hüllen zu der Punktwolke,
-	 * welche durch pointSetInput definiert wird.
+	 * Berechnet die Punkte der konvexen Hüllen zu der Punktwolke, welche durch
+	 * pointSetInput definiert wird.
 	 * 
 	 * @param pointSetInput
 	 * @return
@@ -23,18 +23,19 @@ public abstract class QuickHull {
 	public abstract List<Point> getBorderPoints(List<Point> pointSetInput);
 
 	/**
-	 * bestimmt den Punkt aus der Liste der am weitesten links liegt,
-	 * also den kleinsten x-Wert hat
+	 * bestimmt den Punkt aus der Liste der am weitesten links liegt, also den
+	 * kleinsten x-Wert hat
 	 * 
-	 * @param list die Liste mit den Punkten
+	 * @param list
+	 *            die Liste mit den Punkten
 	 * @return der Punkt mit dem geringsten x-Wert
 	 */
 	protected Point getRightSidePoint(List<Point> list) {
 		Iterator<Point> iter = list.iterator();
-		
+
 		Point rightSidePoint = iter.next();
-		
-		while(iter.hasNext()) {
+
+		while (iter.hasNext()) {
 			Point curr = iter.next();
 			if (curr.getX() > rightSidePoint.getX()) {
 				rightSidePoint = curr;
@@ -45,27 +46,28 @@ public abstract class QuickHull {
 	}
 
 	/**
-	 * bestimmt den Punt aus der Liste, welcher am weitesten rechts liegt,
-	 * also den größten x-Wert hat
+	 * bestimmt den Punt aus der Liste, welcher am weitesten rechts liegt, also
+	 * den größten x-Wert hat
 	 * 
-	 * @param list die Liste der Punkte
+	 * @param list
+	 *            die Liste der Punkte
 	 * @return der Punkt der am weitesten rechts liegt
 	 */
 	protected Point getLeftSidePoint(List<Point> list) {
 		Iterator<Point> iter = list.iterator();
-		
+
 		Point leftSidePoint = iter.next();
 
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			Point curr = iter.next();
-			if(curr.getX() < leftSidePoint.getX()) {
+			if (curr.getX() < leftSidePoint.getX()) {
 				leftSidePoint = curr;
 			}
 		}
 
 		return leftSidePoint;
 	}
-	
+
 	protected Point getFarSidePoint(List<Point> list) {
 		Iterator<Point> iter = list.iterator();
 
@@ -80,7 +82,7 @@ public abstract class QuickHull {
 
 		return farSidePoint;
 	}
-	
+
 	protected Point getNearSidePoint(List<Point> list) {
 		Iterator<Point> iter = list.iterator();
 
@@ -125,5 +127,5 @@ public abstract class QuickHull {
 
 		return lowSidePoint;
 	}
-	
+
 }

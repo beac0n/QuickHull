@@ -6,5 +6,5 @@ public interface Point {
 
 	public double getY();
 
-	public double getZ();	
+	public double getZ();
 }
