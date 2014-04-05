@@ -265,7 +265,7 @@ public class QuickHull3D extends QuickHull {
 	 * @param borderPoints
 	 *            Liste der Randpunkte
 	 */
-	protected void calculateBorder(Point leftSidePoint, Point rightSidePoint,
+	private void calculateBorder(Point leftSidePoint, Point rightSidePoint,
 			Point farSidePoint, List<Point> pointSet, List<Point> borderPoints) {
 
 		if (pointSet.size() == 0)
@@ -383,7 +383,7 @@ public class QuickHull3D extends QuickHull {
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	protected double getDifferenceFromNormal(Point leftSidePoint,
+	private double getDifferenceFromNormal(Point leftSidePoint,
 			Point rightSidepoint, Point farSidePoint, Point x) {
 
 		// Ebenengleichung normale n = (q-p) x (r-p)

@@ -1,0 +1,29 @@
+@startuml
+package main {
+	interface Point {
+	+ double getX()
+	+ double getY()
+	+ double getZ()
+	}
+
+	class Point2D {
+	+ double getX()
+	+ double getY()
+	+ double getZ()
+	+ int hashCode()
+	+ boolean equals(Object obj)
+	}
+
+	class Point3D {
+	+ double getX()
+	+ double getY()
+	+ double getZ()
+	+ int hashCode()
+	+ boolean equals(Object obj)
+	}
+
+	Point <|-- Point3D
+	Point <|-- Point2D
+
+}
+@enduml

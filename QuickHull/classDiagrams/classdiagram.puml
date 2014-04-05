@@ -1,0 +1,45 @@
+@startuml
+package main {
+	abstract class QuickHull {
+	+ {abstract} List<Point> getBorderPoints(List<Point> pointSetInput)
+	# Point getRightSidePoint(List<Point> list)
+	# Point getLeftSidePoint(List<Point> list)
+	# Point getFarSidePoint(List<Point> list)
+	# Point getNearSidePoint(List<Point> list)
+	# Point getTopSidePoint(List<Point> list)
+	# Point getLowSidePoint(List<Point> list)
+	}
+
+	class QuickHull3D {
+	+ List<Point> getBorderPoints(List<Point> pointSetInput)
+	- List<Point> getInitialhull(List<Point> pointSet)
+	- Point getMaxDistantPointFromPlane(List<Point> pointSet, Point maxfirst, Point maxsecond, Point maxdistPointLine)
+	- Point getMaxDistantPointFromLine(List<Point> pointSet, Point maxfirst, Point maxsecond)
+	- double getDistanceFromLine(Point u, Point p, Point x)
+	- void calculateBorder(Point leftSidePoint, Point rightSidePoint, Point farSidePoint, List<Point> pointSet, List<Point> borderPoints)
+	- Point getUppestPoint(Point leftSidePoint, Point rightSidePoint, Point farSidePoint, List<Point> currentPointSet)
+	- List<Point> getAllPointsOver(Point leftSidePoint,	Point rightSidePoint, Point farSidePoint, List<Point> upperSet)
+	- double getDifferenceFromNormal(Point leftSidePoint, Point rightSidepoint, Point farSidePoint, Point x)
+	- double getDifferenceFromNormal(Point a, Point b, Point upperCheck)
+	- void calculateBorder(Point leftSidePoint, Point rightSidePoint, List<Point> pointSet, List<Point> borderPoints) 
+	}
+
+	class QuickHull2D {
+	+ List<Point> getBorderPoints(List<Point> pointSetInput)
+	- void splitInUpperAndLower(Point leftSidePoint, Point rightSidePoint, List<Point> currentPointSet, List<Point> borderPoints)
+	- double getDifferenceFromNormal(Point a, Point b, Point upperCheck)
+	# void calculateBorder(Point leftSidePoint, Point rightSidePoint, List<Point> pointSet, List<Point> borderPoints)
+	- List<Point> getAllPointsOver(Point leftSidePoint,	Point rightSidePoint, List<Point> upperSet)
+	- Point getUppestPoint(Point leftSidePoint, Point rightSidePoint, List<Point> currentPointSet)
+	}
+
+	class QuickHull2DNoRecrusion {
+	# void calculateBorder(Point leftSidePoint, Point rightSidePoint, List<Point> pointSet, List<Point> borderPoints)
+	}
+
+
+	QuickHull <|-up- QuickHull3D
+	QuickHull <|-down- QuickHull2D
+	QuickHull2D <|-down- QuickHull2DNoRecrusion
+}
+@enduml

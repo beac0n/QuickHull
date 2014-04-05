@@ -12,6 +12,8 @@ import org.junit.Test;
 
 public class QuickHull2DTest extends QuickHullTest {
 
+	protected int pointCap = 4000000;
+	
 	@Test
 	public void testPointsBestCasePerformance() throws IOException {
 		System.out.println("=== testPointsBestCasePerformance ===");
@@ -50,7 +52,7 @@ public class QuickHull2DTest extends QuickHullTest {
 	@Test
 	public void testPointsCirclePerformance() {
 		System.out.println("=== testPointsCirclePerformance ===");
-		for (int i = 1000; i < pointCapHalf; i *= 2) {
+		for (int i = 1000; i < pointCap; i *= 2) {
 			List<Point> pointList = getRandomSphereGaussianPoints(i, false);
 			System.out.println(i + " points: " + timeForPoints(pointList, 10)
 					+ " ms");

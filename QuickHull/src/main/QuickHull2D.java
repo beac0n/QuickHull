@@ -51,7 +51,7 @@ public class QuickHull2D extends QuickHull {
 	 * @param borderPoints
 	 *            die zu befüllende Liste, welche die Randpunkte darstellt
 	 */
-	protected void splitInUpperAndLower(Point leftSidePoint,
+	private void splitInUpperAndLower(Point leftSidePoint,
 			Point rightSidePoint, List<Point> currentPointSet,
 			List<Point> borderPoints) {
 
@@ -94,7 +94,7 @@ public class QuickHull2D extends QuickHull {
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	protected double getDifferenceFromNormal(Point a, Point b, Point upperCheck) {
+	private double getDifferenceFromNormal(Point a, Point b, Point upperCheck) {
 		// normale
 		double nx = -(b.getY() - a.getY());
 		double ny = b.getX() - a.getX();
@@ -155,7 +155,7 @@ public class QuickHull2D extends QuickHull {
 	 *            Lister der Punkte
 	 * @return Liste der Punkte die oberhalb der Linie liegen
 	 */
-	protected List<Point> getAllPointsOver(Point leftSidePoint,
+	private List<Point> getAllPointsOver(Point leftSidePoint,
 			Point rightSidePoint, List<Point> upperSet) {
 		List<Point> returnValue = new LinkedList<Point>();
 
@@ -187,7 +187,7 @@ public class QuickHull2D extends QuickHull {
 	 *            die Punktliste
 	 * @return der Punkt der am weitesten von der Linie entfernt ist
 	 */
-	protected Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
+	private Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
 			List<Point> currentPointSet) {
 
 		Point uppestPoint = null;
