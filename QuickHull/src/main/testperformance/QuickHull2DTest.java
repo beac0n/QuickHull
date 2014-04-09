@@ -11,13 +11,16 @@ import main.QuickHull2D;
 import org.junit.Test;
 
 public class QuickHull2DTest extends QuickHullTest {
-
-	protected int pointCap = 4000000;
+	{
+		pointCap *= 16;
+	}
 	
 	@Test
 	public void testPointsBestCasePerformance() throws IOException {
 		System.out.println("=== testPointsBestCasePerformance ===");
 
+		int pointCapHalf = pointCap/2;
+		
 		Point a = new Point2D(-pointCap, -pointCap);
 		Point b = new Point2D(-pointCap, pointCap);
 		Point c = new Point2D(pointCap, pointCap);

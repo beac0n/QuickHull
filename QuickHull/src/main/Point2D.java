@@ -33,7 +33,14 @@ public class Point2D implements Point {
 	}
 
 	public int hashCode() {
-		return Double.valueOf(x).hashCode();
+		
+		long p1 = 73856093;
+		long p2 = 19349663;
+		
+		long xBits = Double.doubleToLongBits(x);
+		long yBits = Double.doubleToLongBits(y);
+		
+		return (int) (xBits*p1 ^ yBits*p2);
 	}
 
 	public boolean equals(Object obj) {

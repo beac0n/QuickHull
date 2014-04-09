@@ -22,7 +22,7 @@ public abstract class QuickHullTest {
 	private Color normalPointsColor = new Color(255, 0, 0);
 	private Color borderPointsColor = new Color(255, 255, 255);
 
-	protected int pointCap = 10000;
+	protected int pointCap = 10_000;
 	protected int pointCapHalf = pointCap / 2;
 
 	protected abstract QuickHull createQuickHullObject();
@@ -46,7 +46,7 @@ public abstract class QuickHullTest {
 				+ "'/> </Appearance> <PointSet> <Coordinate point='";
 	}
 
-	protected Collection<Point> getBorderAndWriteToFile(List<Point> pointList,
+	protected Collection<Point> getBorderAndWriteToFile(Collection<Point> points,
 			String filename) throws FileNotFoundException {
 		QuickHull qh = createQuickHullObject();
 
@@ -59,10 +59,10 @@ public abstract class QuickHullTest {
 		out.flush();
 
 		System.out.print("now calculating border points... ");
-		Collection<Point> border = qh.getBorderPoints(pointList);
+		Collection<Point> border = qh.getBorderPoints(points);
 		System.out.print("border points calculated, now writing them to "
 				+ filename + ".x3d... ");
-		Iterator<Point> iter = pointList.iterator();
+		Iterator<Point> iter = points.iterator();
 
 		while (iter.hasNext()) {
 			Point cur = iter.next();

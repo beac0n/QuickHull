@@ -75,7 +75,7 @@ public class QuickHull3DTest extends QuickHullTest {
 
 		Random rand = new Random();
 
-		for (int i = 1000; i < pointCapHalf; i *= 2) {
+		for (int i = 1000; i < pointCap; i *= 2) {
 			for (int j = 0; j < i; ++j) {
 				double tempX = rand.nextGaussian();
 				double tempY = rand.nextGaussian();

@@ -13,8 +13,7 @@ import main.QuickHull;
 
 public abstract class QuickHullTest {
 
-	protected int pointCap = 300000;
-	protected int pointCapHalf = pointCap / 2;
+	protected int pointCap = 200000;
 
 	protected abstract QuickHull createQuickHullObject();
 

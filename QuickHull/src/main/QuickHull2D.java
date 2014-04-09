@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +22,11 @@ public class QuickHull2D extends QuickHull {
 	 *            Die Liste der gegebenen Punkte
 	 * @return eine Liste der Randpunkte
 	 */
-	public Collection<Point> getBorderPoints(Collection<Point> points) {
-		List<Point> borderPoints = new LinkedList<Point>();
+	public Collection<Point> getBorderPoints(Collection<Point> pointsInput) {		
+		if(pointsInput.size() < 4) return pointsInput;
+		
+		List<Point> borderPoints = new LinkedList<Point>();		
+		List<Point> points = new ArrayList<Point>(pointsInput);
 
 		Point leftSidePoint = getLeftSidePoint(points);
 		Point rightSidePoint = getRightSidePoint(points);
@@ -54,8 +58,10 @@ public class QuickHull2D extends QuickHull {
 			Point right, Collection<Point> points,
 			List<Point> borderPoints) {
 
-		List<Point> upperSet = new LinkedList<>();
-		List<Point> lowerSet = new LinkedList<>();
+		int pointsSize = points.size();
+		
+		List<Point> upperSet = new ArrayList<Point>(pointsSize);
+		List<Point> lowerSet = new ArrayList<Point>(pointsSize);
 
 		for (Point current : points) {
 			if (getDifferenceFromNormal(left, right, current) > 0) {
@@ -113,22 +119,17 @@ public class QuickHull2D extends QuickHull {
 	protected void calculateBorder(Point left, Point right,
 			List<Point> points, List<Point> borderPoints) {
 
-		if (points.size() == 0)
-			return;
+		if (points.size() == 0) return;
 
-		Point uppestPoint = getUppestPoint(left, right,
-				points);
+		Point uppestPoint = getUppestPoint(left, right,	points);
 
-		List<Point> leftUpperSet = getAllPointsOver(left, uppestPoint,
-				points);
+		List<Point> leftUpperSet = getAllPointsOver(left, uppestPoint, points);
 		calculateBorder(left, uppestPoint, leftUpperSet, borderPoints);
 
 		borderPoints.add(uppestPoint);
 
-		List<Point> rightUpperSet = getAllPointsOver(uppestPoint,
-				right, points);
-		calculateBorder(uppestPoint, right, rightUpperSet,
-				borderPoints);
+		List<Point> rightUpperSet = getAllPointsOver(uppestPoint, right, points);
+		calculateBorder(uppestPoint, right, rightUpperSet, borderPoints);
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class QuickHull2D extends QuickHull {
 		return points
 				.stream()
 				.filter(p -> getDifferenceFromNormal(left, right, p) > 0)
-				.collect(Collectors.toCollection(() -> new LinkedList<Point>()));
+				.collect(Collectors.toCollection(() -> new ArrayList<Point>(points.size())));
 	}
 
 	/**

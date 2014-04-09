@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -41,16 +42,19 @@ public class QuickHull3D extends QuickHull {
 
 		points.removeAll(initHull);
 
-		List<Point> behindSet = getAllPointsOver(initHull.get(2),
+		HashSet<Point> behindSet = getAllPointsOver(initHull.get(2),
 				initHull.get(1), initHull.get(0), points);
 		points.removeAll(behindSet);
-		List<Point> rightSet = getAllPointsOver(initHull.get(1),
+
+		HashSet<Point> rightSet = getAllPointsOver(initHull.get(1),
 				initHull.get(3), initHull.get(0), points);
 		points.removeAll(rightSet);
-		List<Point> leftSet = getAllPointsOver(initHull.get(3),
+
+		HashSet<Point> leftSet = getAllPointsOver(initHull.get(3),
 				initHull.get(2), initHull.get(0), points);
 		points.removeAll(leftSet);
-		List<Point> lowerSet = getAllPointsOver(initHull.get(2),
+
+		HashSet<Point> lowerSet = getAllPointsOver(initHull.get(2),
 				initHull.get(3), initHull.get(1), points);
 		points.removeAll(lowerSet);
 
@@ -79,76 +83,144 @@ public class QuickHull3D extends QuickHull {
 
 		// bestimme die zwei am weitesten entfernten punkte
 		Point left = getLeftSidePoint(points);
+		Collection<Point> leftPoints = getAllEqualX(points, left);
+
 		Point right = getRightSidePoint(points);
+		Collection<Point> rightPoints = getAllEqualX(points, right);
 
 		Point top = getTopSidePoint(points);
+		Collection<Point> topPoints = getAllEqualY(points, top);
+
 		Point low = getLowSidePoint(points);
+		Collection<Point> lowPoints = getAllEqualY(points, low);
 
 		Point far = getFarSidePoint(points);
+		Collection<Point> farPoints = getAllEqualZ(points, far);
+
 		Point near = getNearSidePoint(points);
+		Collection<Point> nearPoints = getAllEqualZ(points, near);
 
-		double distLRX = left.getX() - right.getX();
-		double distLRY = left.getY() - right.getY();
-		double distLRZ = left.getZ() - right.getZ();
-
-		double distLR = distLRX * distLRX + distLRY * distLRY + distLRZ
-				* distLRZ;
-
-		double distTLX = top.getX() - low.getX();
-		double distTLY = top.getY() - low.getY();
-		double distTLZ = top.getZ() - low.getZ();
-
-		double distTL = distTLX * distTLX + distTLY * distTLY + distTLZ
-				* distTLZ;
-
-		double distFNX = far.getX() - near.getX();
-		double distFNY = far.getY() - near.getY();
-		double distFNZ = far.getZ() - near.getZ();
-
-		double distFN = distFNX * distFNX + distFNY * distFNY + distFNZ
-				* distFNZ;
-
-		List<Double> temp = new LinkedList<Double>();
-		temp.add(distLR);
-		temp.add(distTL);
-		temp.add(distFN);
-
-		double max = Collections.max(temp);
-
-		Point maxfirst;
-		Point maxsecond;
-
-		if (max == distLR) {
-			maxfirst = left;
-			maxsecond = right;
-		} else if (max == distTL) {
-			maxfirst = top;
-			maxsecond = low;
-		} else {
-			maxfirst = far;
-			maxsecond = near;
+		List<TwoPointDistance> distances = new LinkedList<TwoPointDistance>();
+		
+		// if distant points lie on same dimension
+		Optional<TwoPointDistance> lrPoints = getMaxDistanceOfFixedDimension(leftPoints, rightPoints, false);
+		Optional<TwoPointDistance> tlPoints = getMaxDistanceOfFixedDimension(topPoints, lowPoints, false);
+		Optional<TwoPointDistance> fnPoints = getMaxDistanceOfFixedDimension(farPoints, nearPoints, true);
+		
+		if(lrPoints.isPresent()) {
+			distances.add(lrPoints.get());
 		}
+		else {
+			distances.add(getMaxDistanceOf(leftPoints, rightPoints));
+		}
+		
+		if(tlPoints.isPresent()) {
+			distances.add(tlPoints.get());
+		}
+		else {
+			distances.add(getMaxDistanceOf(topPoints, lowPoints));
+		}
+		
+		if(fnPoints.isPresent()) {
+			distances.add(fnPoints.get());
+		}
+		else {
+			distances.add(getMaxDistanceOf(farPoints, nearPoints));
+		}
+
+		TwoPointDistance maxDistance = distances
+				.stream()
+				.max((a, b) -> (int) Math.signum(a.generateDistance()
+						- b.generateDistance())).get();
+
+		Point maxfirst = maxDistance.getB();
+		Point maxsecond = maxDistance.getA();
 
 		points.remove(maxfirst);
 		points.remove(maxsecond);
-		
+
 		// bestimmte den Punkt der am weitesten von der Linie entfernt ist
 		Point maxdistPointLine = getMaxDistantPointFromLine(points, maxfirst,
 				maxsecond);
 		points.remove(maxdistPointLine);
 
 		// bestimmte den Punkt der am weitesten von der Ebene entfernt ist
-		Point maxdistPointPlane = getMaxDistantPointFromPlane(points,
-				maxfirst, maxsecond, maxdistPointLine);
+		Point maxdistPointPlane = getMaxDistantPointFromPlane(points, maxfirst,
+				maxsecond, maxdistPointLine);
 		points.remove(maxdistPointPlane);
 
+		double planeToPoint = getDifferenceFromNormal(maxfirst, maxsecond,
+				maxdistPointLine, maxdistPointPlane);
+
 		List<Point> returnValue = new ArrayList<Point>();
-		returnValue.add(maxfirst);
-		returnValue.add(maxsecond);
-		returnValue.add(maxdistPointLine);
+
+		if (planeToPoint < 0) {
+			returnValue.add(maxdistPointLine);
+			returnValue.add(maxsecond);
+			returnValue.add(maxfirst);
+		} else {
+			returnValue.add(maxfirst);
+			returnValue.add(maxsecond);
+			returnValue.add(maxdistPointLine);
+		}
+
 		returnValue.add(maxdistPointPlane);
 
 		return returnValue;
+	}
+
+	private Optional<TwoPointDistance> getMaxDistanceOfFixedDimension(Collection<Point> sideA,
+			Collection<Point> sideB, boolean isZ) {
+		HashSet<TwoPointDistance> distances = new HashSet<TwoPointDistance>();
+
+		for (Point curA : sideA) {
+			for (Point curB : sideB) {
+				if (isZ) {
+					if (curB.getX() == curA.getX()) {
+						distances.add(new TwoPointDistance(curA, curB));
+					}
+				} else if (curB.getZ() == curA.getZ()) {
+					distances.add(new TwoPointDistance(curA, curB));
+				}
+
+			}
+		}
+
+		return distances
+				.stream()
+				.max((a, b) -> (int) Math.signum(a.generateDistance()
+						- b.generateDistance()));
+	}
+
+	private TwoPointDistance getMaxDistanceOf(Collection<Point> sideA, Collection<Point> sideB) {
+		HashSet<TwoPointDistance> distances = new HashSet<TwoPointDistance>();
+
+		for (Point curA : sideA) {
+			for (Point curB : sideB) {
+				distances.add(new TwoPointDistance(curA, curB));
+
+			}
+		}
+
+		return distances
+				.stream()
+				.max((a, b) -> (int) Math.signum(a.generateDistance()
+						- b.generateDistance())).get();
+	}
+
+	private Collection<Point> getAllEqualX(HashSet<Point> points, Point left) {
+		return points.stream().filter(a -> a.getX() == left.getX())
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+	}
+
+	private Collection<Point> getAllEqualY(HashSet<Point> points, Point left) {
+		return points.stream().filter(a -> a.getY() == left.getY())
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
+	}
+
+	private Collection<Point> getAllEqualZ(HashSet<Point> points, Point left) {
+		return points.stream().filter(a -> a.getZ() == left.getZ())
+				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 
 	/**
@@ -167,11 +239,12 @@ public class QuickHull3D extends QuickHull {
 	 */
 	private Point getMaxDistantPointFromPlane(Collection<Point> points,
 			Point p, Point q, Point r) {
-		
-		return points.stream().max((a,b) -> (int) Math.signum(
-				Math.abs(getDifferenceFromNormal(p, q, r, a)) -
-				Math.abs(getDifferenceFromNormal(p, q, r, b))
-				)).get();
+
+		return points
+				.stream()
+				.max((a, b) -> (int) Math.signum(Math
+						.abs(getDifferenceFromNormal(p, q, r, a))
+						- Math.abs(getDifferenceFromNormal(p, q, r, b)))).get();
 	}
 
 	/**
@@ -186,21 +259,17 @@ public class QuickHull3D extends QuickHull {
 	 *            zweiter Punkt der Geraden
 	 * @return der Punkt der am weitesten von der Geraden entfernt ist
 	 */
-	private Point getMaxDistantPointFromLine(Collection<Point> points,
-			Point p, Point q) {
+	private Point getMaxDistantPointFromLine(Collection<Point> points, Point p,
+			Point q) {
 		// determinantenform: u x (x-p) = 0
 		// bestimme u => Richtungsvektor
-		Point u = new Point3D(
-				p.getX() - q.getX(),
-				p.getY() - q.getY(), 
+		Point u = new Point3D(p.getX() - q.getX(), p.getY() - q.getY(),
 				p.getZ() - q.getZ());
 
 		return points
 				.stream()
-				.max((a, b) -> (int) Math.signum(
-						getDistanceFromLine(u, p, a) 
-						- getDistanceFromLine(u, p, b)))
-				.get();
+				.max((a, b) -> (int) Math.signum(getDistanceFromLine(u, p, a)
+						- getDistanceFromLine(u, p, b))).get();
 	}
 
 	/**
@@ -250,7 +319,7 @@ public class QuickHull3D extends QuickHull {
 	 *            Liste der Randpunkte
 	 */
 	private void calculateBorder(Point left, Point right, Point far,
-			List<Point> points, List<Point> borderPoints) {
+			HashSet<Point> points, List<Point> borderPoints) {
 		if (points.size() == 0)
 			return;
 
@@ -259,15 +328,15 @@ public class QuickHull3D extends QuickHull {
 		points.remove(uppest);
 		borderPoints.add(uppest);
 
-		List<Point> rightUpperList = getAllPointsOver(uppest, far, left,
+		HashSet<Point> rightUpperList = getAllPointsOver(uppest, far, left,
 				points);
 		points.removeAll(rightUpperList);
 
-		List<Point> leftUpperList = getAllPointsOver(left, right, uppest,
+		HashSet<Point> leftUpperList = getAllPointsOver(left, right, uppest,
 				points);
 		points.removeAll(leftUpperList);
 
-		List<Point> farUpperList = getAllPointsOver(right, far, uppest,
+		HashSet<Point> farUpperList = getAllPointsOver(right, far, uppest,
 				points);
 		points.removeAll(farUpperList);
 
@@ -311,13 +380,13 @@ public class QuickHull3D extends QuickHull {
 	 *            die Punktmenge aus der die Punkte zu bestimmen sind
 	 * @return die Punkte oberhalb der Ebene
 	 */
-	private List<Point> getAllPointsOver(Point left, Point right, Point far,
+	private HashSet<Point> getAllPointsOver(Point left, Point right, Point far,
 			Collection<Point> points) {
 		return points
 				.stream()
 				.filter(currPoint -> getDifferenceFromNormal(left, right, far,
 						currPoint) > 0)
-				.collect(Collectors.toCollection(() -> new LinkedList<Point>()));
+				.collect(Collectors.toCollection(() -> new HashSet<Point>()));
 	}
 
 	/**

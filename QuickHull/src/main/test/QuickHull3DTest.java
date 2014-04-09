@@ -28,15 +28,27 @@ public class QuickHull3DTest extends QuickHullTest {
 
 		Point a = new Point3D(-pointCap, -pointCap, -pointCap);
 		Point b = new Point3D(pointCap, pointCap, -pointCap);
-		Point c = new Point3D(-pointCap, pointCap, -pointCap);
+		Point c = new Point3D(-pointCap - 1, pointCap, -pointCap);
 		Point d = new Point3D(pointCap, -pointCap, -pointCap);
 
-		Point e = new Point3D(-pointCap, -pointCap, pointCap);
+		Point e = new Point3D(-pointCap, -pointCap, pointCap + 1);
 		Point f = new Point3D(pointCap, pointCap, pointCap);
 		Point g = new Point3D(-pointCap, pointCap, pointCap);
 		Point h = new Point3D(pointCap, -pointCap, pointCap);
 
-		List<Point> pointList = getRandomPoints(-pointCapHalf, pointCap,
+		/*
+		  Point a = new Point3D(-pointCap++, -pointCap++, -pointCap++); Point b
+		  = new Point3D(pointCap++, pointCap++, -pointCap++); Point c = new
+		  Point3D(-pointCap++, pointCap++, -pointCap++); Point d = new
+		  Point3D(pointCap++, -pointCap++, -pointCap++);
+		  
+		  Point e = new Point3D(-pointCap++, -pointCap++, pointCap++); Point f
+		  = new Point3D(pointCap++, pointCap++, pointCap++); Point g = new
+		  Point3D(-pointCap++, pointCap++, pointCap++); Point h = new
+		  Point3D(pointCap++, -pointCap++, pointCap++);
+		 */
+
+		Collection<Point> pointList = getRandomPoints(-pointCapHalf, pointCap,
 				-pointCapHalf, pointCap, -pointCapHalf, pointCap, pointCap - 8);
 
 		pointList.add(a);
@@ -49,7 +61,8 @@ public class QuickHull3DTest extends QuickHullTest {
 		pointList.add(g);
 		pointList.add(h);
 
-		Collection<Point> borderPoints = getBorderAndWriteToFile(pointList, "3D_testPointsBestCase");
+		Collection<Point> borderPoints = getBorderAndWriteToFile(pointList,
+				"3D_testPointsBestCase");
 
 		assertEquals(8, borderPoints.size());
 		assertTrue(borderPoints.contains(a));
@@ -67,7 +80,7 @@ public class QuickHull3DTest extends QuickHullTest {
 	public void testPointsRandom() throws IOException, InterruptedException {
 		List<Point> pointList = new LinkedList<Point>();
 		pointList = getRandomGaussianPoints(pointCap, true);
-		getBorderAndWriteToFile(pointList, "3D_testPointsRandom3D");
+		getBorderAndWriteToFile(pointList, "3D_testPointsRandom");
 	}
 
 	@Test
@@ -109,9 +122,9 @@ public class QuickHull3DTest extends QuickHullTest {
 		assertEquals(pointList.size(), bps.size());
 	}
 
-	protected List<Point> getRandomPoints(int xMin, int rangeX, int yMin,
+	protected Collection<Point> getRandomPoints(int xMin, int rangeX, int yMin,
 			int rangeY, int zMin, int rangeZ, int count) {
-		List<Point> pointList = new LinkedList<Point>();
+		HashSet<Point> pointList = new HashSet<Point>();
 
 		for (int i = 0; i < count; ++i) {
 			double tempX = Math.random() * rangeX + xMin;

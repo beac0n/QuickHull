@@ -34,7 +34,15 @@ public class Point3D implements Point {
 	}
 
 	public int hashCode() {
-		return Double.valueOf(x).hashCode();
+		long p1 = 73856093;
+		long p2 = 19349663;
+		long p3 = 83492791;
+		
+		long xBits = Double.doubleToLongBits(x);
+		long yBits = Double.doubleToLongBits(y);
+		long zBits = Double.doubleToLongBits(z);
+		
+		return (int) (xBits*p1 ^ yBits*p2 ^ zBits*p3);
 	}
 
 	public boolean equals(Object obj) {
