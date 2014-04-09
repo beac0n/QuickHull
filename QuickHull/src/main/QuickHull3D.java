@@ -1,10 +1,14 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im
@@ -18,37 +22,37 @@ public class QuickHull3D extends QuickHull {
 	/**
 	 * Liefert für eine gegebene Liste an Punkten alle Randpunkte.
 	 * 
-	 * @param pointSetInput
+	 * @param pointInput
 	 *            Die Liste der gegebenen Punkte
 	 * @return eine Liste der Randpunkte
 	 */
-	public List<Point> getBorderPoints(List<Point> pointSetInput) {
+	public Collection<Point> getBorderPoints(Collection<Point> pointInput) {
 
-		if (pointSetInput.size() < 5)
-			return pointSetInput;
+		if (pointInput.size() < 5)
+			return pointInput;
 
-		List<Point> pointSet = new ArrayList<Point>(pointSetInput);
+		HashSet<Point> points = new HashSet<Point>(pointInput);
 
 		List<Point> borderPoints = new LinkedList<Point>();
 
-		List<Point> initHull = getInitialhull(pointSet);
+		List<Point> initHull = getInitialhull(points);
 
 		borderPoints.addAll(initHull);
 
-		pointSet.removeAll(initHull);
+		points.removeAll(initHull);
 
 		List<Point> behindSet = getAllPointsOver(initHull.get(2),
-				initHull.get(1), initHull.get(0), pointSet);
-		pointSet.removeAll(behindSet);
+				initHull.get(1), initHull.get(0), points);
+		points.removeAll(behindSet);
 		List<Point> rightSet = getAllPointsOver(initHull.get(1),
-				initHull.get(3), initHull.get(0), pointSet);
-		pointSet.removeAll(rightSet);
+				initHull.get(3), initHull.get(0), points);
+		points.removeAll(rightSet);
 		List<Point> leftSet = getAllPointsOver(initHull.get(3),
-				initHull.get(2), initHull.get(0), pointSet);
-		pointSet.removeAll(leftSet);
+				initHull.get(2), initHull.get(0), points);
+		points.removeAll(leftSet);
 		List<Point> lowerSet = getAllPointsOver(initHull.get(2),
-				initHull.get(3), initHull.get(1), pointSet);
-		pointSet.removeAll(lowerSet);
+				initHull.get(3), initHull.get(1), points);
+		points.removeAll(lowerSet);
 
 		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0),
 				behindSet, borderPoints);
@@ -66,22 +70,22 @@ public class QuickHull3D extends QuickHull {
 	 * Bestimmt die ersten 4 Punkte welche benötigt werden um den Quckhull
 	 * Algorithmus im dreidimensionalen Raum auszuführen.
 	 * 
-	 * @param pointSet
-	 *            Liste von Punkten, aus welchen später die konvexen
+	 * @param points
+	 *            Collection von Punkten, aus welchen später die konvexen
 	 *            Hüllenpunkte berechnet werden.
 	 * @return Liste mit den ersten 4 Randpunkten
 	 */
-	private List<Point> getInitialhull(List<Point> pointSet) {
+	private List<Point> getInitialhull(HashSet<Point> points) {
 
-		// bestimmte die zwei am weitesten entfernten punkte
-		Point left = getLeftSidePoint(pointSet);
-		Point right = getRightSidePoint(pointSet);
+		// bestimme die zwei am weitesten entfernten punkte
+		Point left = getLeftSidePoint(points);
+		Point right = getRightSidePoint(points);
 
-		Point top = getTopSidePoint(pointSet);
-		Point low = getLowSidePoint(pointSet);
+		Point top = getTopSidePoint(points);
+		Point low = getLowSidePoint(points);
 
-		Point far = getFarSidePoint(pointSet);
-		Point near = getNearSidePoint(pointSet);
+		Point far = getFarSidePoint(points);
+		Point near = getNearSidePoint(points);
 
 		double distLRX = left.getX() - right.getX();
 		double distLRY = left.getY() - right.getY();
@@ -125,18 +129,20 @@ public class QuickHull3D extends QuickHull {
 			maxsecond = near;
 		}
 
-		pointSet.remove(maxfirst);
-		pointSet.remove(maxsecond);
-
-		Point maxdistPointLine = getMaxDistantPointFromLine(pointSet, maxfirst,
+		points.remove(maxfirst);
+		points.remove(maxsecond);
+		
+		// bestimmte den Punkt der am weitesten von der Linie entfernt ist
+		Point maxdistPointLine = getMaxDistantPointFromLine(points, maxfirst,
 				maxsecond);
-		pointSet.remove(maxdistPointLine);
+		points.remove(maxdistPointLine);
 
-		Point maxdistPointPlane = getMaxDistantPointFromPlane(pointSet,
+		// bestimmte den Punkt der am weitesten von der Ebene entfernt ist
+		Point maxdistPointPlane = getMaxDistantPointFromPlane(points,
 				maxfirst, maxsecond, maxdistPointLine);
-		pointSet.remove(maxdistPointPlane);
+		points.remove(maxdistPointPlane);
 
-		List<Point> returnValue = new LinkedList<Point>();
+		List<Point> returnValue = new ArrayList<Point>();
 		returnValue.add(maxfirst);
 		returnValue.add(maxsecond);
 		returnValue.add(maxdistPointLine);
@@ -149,74 +155,52 @@ public class QuickHull3D extends QuickHull {
 	 * berechnet den Punkt der am weitesten von der Ebene entfernt ist, welche
 	 * durch die drei punkte maxfirst maxsecond maxdistPointLine bestimmt wird.
 	 * 
-	 * @param pointSet
+	 * @param points
 	 *            die Liste von Punkten die existieren
-	 * @param maxfirst
+	 * @param p
 	 *            der erste Punkt der Ebene
-	 * @param maxsecond
+	 * @param q
 	 *            der zweite Punkt der Ebene
-	 * @param maxdistPointLine
+	 * @param r
 	 *            der dritte Punkt der Ebene
 	 * @return der Punkt der am weitesten von der Ebene entfernt ist
 	 */
-	private Point getMaxDistantPointFromPlane(List<Point> pointSet,
-			Point maxfirst, Point maxsecond, Point maxdistPointLine) {
-		Iterator<Point> iter;
-		double oldDist;
-		iter = pointSet.iterator();
-
-		oldDist = 0;
-		Point maxdistPointPlane = null;
-
-		while (iter.hasNext()) {
-			Point cur = iter.next();
-			double curDist = getDifferenceFromNormal(maxfirst, maxsecond,
-					maxdistPointLine, cur);
-
-			if (Math.abs(curDist) > oldDist) {
-				maxdistPointPlane = cur;
-				oldDist = curDist;
-			}
-		}
-		return maxdistPointPlane;
+	private Point getMaxDistantPointFromPlane(Collection<Point> points,
+			Point p, Point q, Point r) {
+		
+		return points.stream().max((a,b) -> (int) Math.signum(
+				Math.abs(getDifferenceFromNormal(p, q, r, a)) -
+				Math.abs(getDifferenceFromNormal(p, q, r, b))
+				)).get();
 	}
 
 	/**
 	 * berechnet den Punkt der am weitesten von der Geraden entfernt ist, welche
 	 * durch die zwei punkte maxfirst und maxsecond bestimmt wird.
 	 * 
-	 * @param pointSet
+	 * @param points
 	 *            Liste der Punkte
-	 * @param maxfirst
+	 * @param p
 	 *            erster Punkt der Geraden
-	 * @param maxsecond
+	 * @param q
 	 *            zweiter Punkt der Geraden
 	 * @return der Punkt der am weitesten von der Geraden entfernt ist
 	 */
-	private Point getMaxDistantPointFromLine(List<Point> pointSet,
-			Point maxfirst, Point maxsecond) {
+	private Point getMaxDistantPointFromLine(Collection<Point> points,
+			Point p, Point q) {
 		// determinantenform: u x (x-p) = 0
 		// bestimme u => Richtungsvektor
-		// p == maxfirst
-		Point u = new Point3D(maxfirst.getX() - maxsecond.getX(),
-				maxfirst.getY() - maxsecond.getY(), maxfirst.getZ()
-						- maxsecond.getZ());
+		Point u = new Point3D(
+				p.getX() - q.getX(),
+				p.getY() - q.getY(), 
+				p.getZ() - q.getZ());
 
-		Iterator<Point> iter = pointSet.iterator();
-
-		double oldDist = 0;
-		Point maxdistPointLine = null;
-
-		while (iter.hasNext()) {
-			Point cur = iter.next();
-			double curDist = getDistanceFromLine(u, maxfirst, cur);
-
-			if (curDist > oldDist) {
-				maxdistPointLine = cur;
-				oldDist = curDist;
-			}
-		}
-		return maxdistPointLine;
+		return points
+				.stream()
+				.max((a, b) -> (int) Math.signum(
+						getDistanceFromLine(u, p, a) 
+						- getDistanceFromLine(u, p, b)))
+				.get();
 	}
 
 	/**
@@ -256,115 +240,84 @@ public class QuickHull3D extends QuickHull {
 	 * Rekursiver Teil des Quickhull-Algorithmuss, der nach und nach den Rand
 	 * der 2-Dimensionalen Punktwolke berechnet.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            linker Punkt der aufzuspannenden Linie
-	 * @param rightSidePoint
+	 * @param right
 	 *            rechter Punkt der aufzuspannenden Linie
-	 * @param pointSet
+	 * @param points
 	 *            momentane Liste der Punkte
 	 * @param borderPoints
 	 *            Liste der Randpunkte
 	 */
-	private void calculateBorder(Point leftSidePoint, Point rightSidePoint,
-			Point farSidePoint, List<Point> pointSet, List<Point> borderPoints) {
-
-		if (pointSet.size() == 0)
+	private void calculateBorder(Point left, Point right, Point far,
+			List<Point> points, List<Point> borderPoints) {
+		if (points.size() == 0)
 			return;
 
-		Point uppestPoint = getUppestPoint(leftSidePoint, rightSidePoint,
-				farSidePoint, pointSet);
+		Point uppest = getUppestPoint(left, right, far, points);
 
-		if (uppestPoint == null)
-			return;
+		points.remove(uppest);
+		borderPoints.add(uppest);
 
-		pointSet.remove(uppestPoint);
-		borderPoints.add(uppestPoint);
+		List<Point> rightUpperList = getAllPointsOver(uppest, far, left,
+				points);
+		points.removeAll(rightUpperList);
 
-		List<Point> rightUpperSet = getAllPointsOver(uppestPoint, farSidePoint,
-				leftSidePoint, pointSet);
-		pointSet.removeAll(rightUpperSet);
-		List<Point> leftUpperSet = getAllPointsOver(leftSidePoint,
-				rightSidePoint, uppestPoint, pointSet);
-		pointSet.removeAll(leftUpperSet);
-		List<Point> farUpperSet = getAllPointsOver(rightSidePoint,
-				farSidePoint, uppestPoint, pointSet);
-		pointSet.removeAll(farUpperSet);
+		List<Point> leftUpperList = getAllPointsOver(left, right, uppest,
+				points);
+		points.removeAll(leftUpperList);
 
-		calculateBorder(uppestPoint, farSidePoint, leftSidePoint,
-				rightUpperSet, borderPoints);
-		calculateBorder(leftSidePoint, rightSidePoint, uppestPoint,
-				leftUpperSet, borderPoints);
-		calculateBorder(rightSidePoint, farSidePoint, uppestPoint, farUpperSet,
-				borderPoints);
+		List<Point> farUpperList = getAllPointsOver(right, far, uppest,
+				points);
+		points.removeAll(farUpperList);
+
+		calculateBorder(uppest, far, left, rightUpperList, borderPoints);
+		calculateBorder(left, right, uppest, leftUpperList, borderPoints);
+		calculateBorder(right, far, uppest, farUpperList, borderPoints);
 	}
 
 	/**
 	 * Bestimmt den Punkt der am weitesten oberhalb einer Ebene liegt.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            erster Punkt der Ebene
-	 * @param rightSidePoint
+	 * @param right
 	 *            zweiter Punkt der Ebene
-	 * @param farSidePoint
+	 * @param far
 	 *            dritter Punkt der Ebene
-	 * @param currentPointSet
+	 * @param points
 	 *            Liste von Punkten
 	 * @return der Punkt der am weitesten oberhalb der Ebene liegt
 	 */
-	private Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
-			Point farSidePoint, List<Point> currentPointSet) {
-
-		Point uppestPoint = null;
-
-		double oldDifferenceFromNormal = 0;
-
-		Iterator<Point> iter = currentPointSet.iterator();
-
-		while (iter.hasNext()) {
-			Point currentPoint = iter.next();
-
-			double currentDifferenceFromNormal = getDifferenceFromNormal(
-					leftSidePoint, rightSidePoint, farSidePoint, currentPoint);
-			if (currentDifferenceFromNormal > oldDifferenceFromNormal) {
-				uppestPoint = currentPoint;
-				oldDifferenceFromNormal = currentDifferenceFromNormal;
-			}
-		}
-
-		return uppestPoint;
+	private Point getUppestPoint(Point left, Point right, Point far,
+			Collection<Point> points) {
+		return points
+				.stream()
+				.max((a, b) -> (int) Math.signum(getDifferenceFromNormal(left,
+						right, far, a)
+						- getDifferenceFromNormal(left, right, far, b))).get();
 	}
 
 	/**
 	 * Bestimmt alle Punkte oberhalb einer Ebene
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            der erste Punkt der Ebene
-	 * @param rightSidePoint
+	 * @param right
 	 *            der zweite Punkt der Ebene
-	 * @param farSidePoint
+	 * @param far
 	 *            der dritte Punkt der Ebene
-	 * @param upperSet
+	 * @param points
 	 *            die Punktmenge aus der die Punkte zu bestimmen sind
 	 * @return die Punkte oberhalb der Ebene
 	 */
-	private List<Point> getAllPointsOver(Point leftSidePoint,
-			Point rightSidePoint, Point farSidePoint, List<Point> upperSet) {
-
-		List<Point> returnValue = new LinkedList<Point>();
-
-		Iterator<Point> iter = upperSet.iterator();
-
-		while (iter.hasNext()) {
-			Point currPoint = iter.next();
-			double differenceFromNormal = getDifferenceFromNormal(
-					leftSidePoint, rightSidePoint, farSidePoint, currPoint);
-
-			if (differenceFromNormal > 0) {
-				returnValue.add(currPoint);
-			}
-		}
-
-		return returnValue;
+	private List<Point> getAllPointsOver(Point left, Point right, Point far,
+			Collection<Point> points) {
+		return points
+				.stream()
+				.filter(currPoint -> getDifferenceFromNormal(left, right, far,
+						currPoint) > 0)
+				.collect(Collectors.toCollection(() -> new LinkedList<Point>()));
 	}
 
 	/**
@@ -373,30 +326,30 @@ public class QuickHull3D extends QuickHull {
 	 * Rückgabewert ist ein Maß für die Distanz. Je weiter der Wert von 0
 	 * entfernt ist, desto weiter ist der Punkt von der Linie entfernt.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            erster Punkt um das Polygon aufzuspannen
-	 * @param rightSidepoint
+	 * @param right
 	 *            zweiter Punkt um das Polygon aufzuspannen
-	 * @param farSidePoint
+	 * @param far
 	 *            dritter Punkt um das Polygon aufzuspannen
 	 * @param x
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	private double getDifferenceFromNormal(Point leftSidePoint,
-			Point rightSidepoint, Point farSidePoint, Point x) {
+	private double getDifferenceFromNormal(Point left, Point right, Point far,
+			Point x) {
 
 		// Ebenengleichung normale n = (q-p) x (r-p)
 
 		// q-p
-		double a1 = rightSidepoint.getX() - leftSidePoint.getX();
-		double a2 = rightSidepoint.getY() - leftSidePoint.getY();
-		double a3 = rightSidepoint.getZ() - leftSidePoint.getZ();
+		double a1 = right.getX() - left.getX();
+		double a2 = right.getY() - left.getY();
+		double a3 = right.getZ() - left.getZ();
 
 		// r-p
-		double b1 = farSidePoint.getX() - leftSidePoint.getX();
-		double b2 = farSidePoint.getY() - leftSidePoint.getY();
-		double b3 = farSidePoint.getZ() - leftSidePoint.getZ();
+		double b1 = far.getX() - left.getX();
+		double b2 = far.getY() - left.getY();
+		double b3 = far.getZ() - left.getZ();
 
 		// (q-p) x (r-p)
 		double normalX = a2 * b3 - a3 * b2;
@@ -404,9 +357,9 @@ public class QuickHull3D extends QuickHull {
 		double normalZ = a1 * b2 - a2 * b1;
 
 		// (x-p)
-		double xMinuspX = x.getX() - leftSidePoint.getX();
-		double xMinuspY = x.getY() - leftSidePoint.getY();
-		double xMinuspZ = x.getZ() - leftSidePoint.getZ();
+		double xMinuspX = x.getX() - left.getX();
+		double xMinuspY = x.getY() - left.getY();
+		double xMinuspZ = x.getZ() - left.getZ();
 
 		// (x-p) * n
 		double endX = xMinuspX * normalX;

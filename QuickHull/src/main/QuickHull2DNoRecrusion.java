@@ -1,6 +1,7 @@
 package main;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 public class QuickHull2DNoRecrusion extends QuickHull2D {
@@ -24,28 +25,27 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 		Stack<Point> leftSidePointStack = new Stack<Point>();
 		Stack<Point> rightSidePointStack = new Stack<Point>();
 		Stack<List<Point>> pointSetStack = new Stack<List<Point>>();
-		Stack<Point> borderPointStack = new Stack<Point>();
+		Stack<Optional> borderPointStack = new Stack<Optional>();
 
 		leftSidePointStack.push(leftSidePoint);
 		rightSidePointStack.push(rightSidePoint);
 		pointSetStack.push(pointSet);
+		borderPointStack.push(Optional.empty());
 
-		Point currentLeftSidePoint = null;
-		Point currentRightSidePoint = null;
-		List<Point> currentPointSet = null;
-		Point uppestPoint = null;
-		Point currBorderPoint = null;
+		Point currentLeftSidePoint;
+		Point currentRightSidePoint;
+		List<Point> currentPointSet;
+		Point uppestPoint;
+		Optional<Point> currBorderPoint;
 		
 		while (!leftSidePointStack.isEmpty()) {
 			currentLeftSidePoint = leftSidePointStack.pop();
 			currentRightSidePoint = rightSidePointStack.pop();
 			currentPointSet = pointSetStack.pop();
-			if(!borderPointStack.empty()) {
-				currBorderPoint = borderPointStack.pop();
-			}
+			currBorderPoint = borderPointStack.pop();
 			
-			if(currentLeftSidePoint.equals(currBorderPoint)) {
-				//borderPoints.add(currBorderPoint);
+			if(currBorderPoint.isPresent()) {
+				borderPoints.add(currBorderPoint.get());
 			}
 
 			currentPointSet.remove(currentLeftSidePoint);
@@ -60,9 +60,6 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 				List<Point> leftUpperSet = getAllPointsOver(
 						currentLeftSidePoint, uppestPoint, currentPointSet);
 
-				borderPointStack.push(uppestPoint);
-				borderPoints.add(uppestPoint);
-
 				List<Point> rightUpperSet = getAllPointsOver(uppestPoint,
 						currentRightSidePoint, currentPointSet);
 
@@ -70,11 +67,13 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 				leftSidePointStack.push(uppestPoint);
 				rightSidePointStack.push(currentRightSidePoint);
 				pointSetStack.push(rightUpperSet);
+				borderPointStack.push(Optional.of(uppestPoint));
 
 				// first recursive call
 				leftSidePointStack.push(currentLeftSidePoint);
 				rightSidePointStack.push(uppestPoint);
-				pointSetStack.push(leftUpperSet);
+				pointSetStack.push(leftUpperSet);						
+				borderPointStack.push(Optional.empty());
 			}
 		}
 	}

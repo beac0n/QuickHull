@@ -1,7 +1,6 @@
 package main;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Abstrakte Klasse die einige Methoden für alle QuickHull implementierungen
@@ -20,112 +19,78 @@ public abstract class QuickHull {
 	 * @param pointSetInput
 	 * @return
 	 */
-	public abstract List<Point> getBorderPoints(List<Point> pointSetInput);
+	public abstract Collection<Point> getBorderPoints(Collection<Point> pointSetInput);
 
 	/**
 	 * bestimmt den Punkt aus der Liste der am weitesten links liegt, also den
 	 * kleinsten x-Wert hat
 	 * 
-	 * @param list
+	 * @param pointSet
 	 *            die Liste mit den Punkten
 	 * @return der Punkt mit dem geringsten x-Wert
 	 */
-	protected Point getRightSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point rightSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getX() > rightSidePoint.getX()) {
-				rightSidePoint = curr;
-			}
-		}
-
-		return rightSidePoint;
+	protected Point getRightSidePoint(Collection<Point> pointSet) {
+		return pointSet.stream().max((a,b) -> (int) Math.signum(a.getX() - b.getX())).get();
 	}
 
 	/**
 	 * bestimmt den Punt aus der Liste, welcher am weitesten rechts liegt, also
 	 * den größten x-Wert hat
 	 * 
-	 * @param list
+	 * @param pointSet
 	 *            die Liste der Punkte
 	 * @return der Punkt der am weitesten rechts liegt
 	 */
-	protected Point getLeftSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point leftSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getX() < leftSidePoint.getX()) {
-				leftSidePoint = curr;
-			}
-		}
-
-		return leftSidePoint;
+	protected Point getLeftSidePoint(Collection<Point> pointSet) {	
+		return  pointSet.stream().min((a,b) -> (int) Math.signum(a.getX() - b.getX())).get();
+	}
+	
+	/**
+	 * bestimmt den Punt aus der Liste, welcher am weitesten in der Tiefe liegt, also
+	 * den größten z-Wert hat
+	 * 
+	 * @param list
+	 *            die Liste der Punkte
+	 * @return der Punkt mit dem größten z-Wert
+	 */
+	protected Point getFarSidePoint(Collection<Point> list) {
+		return list.stream().max((a,b) -> (int) Math.floor(a.getZ() - b.getZ())).get();
 	}
 
-	protected Point getFarSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point farSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getZ() > farSidePoint.getZ()) {
-				farSidePoint = curr;
-			}
-		}
-
-		return farSidePoint;
+	/**
+	 * bestimmt den Punkt aus der Liste der am nähesten liegt, also den
+	 * kleinsten z-Wert hat
+	 * 
+	 * @param list
+	 *            die Liste mit den Punkten
+	 * @return der Punkt mit dem geringsten z-Wert
+	 */
+	protected Point getNearSidePoint(Collection<Point> list) {
+		return list.stream().min((a,b) -> (int) Math.floor(a.getZ() - b.getZ())).get();
 	}
 
-	protected Point getNearSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point nearSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getZ() < nearSidePoint.getZ()) {
-				nearSidePoint = curr;
-			}
-		}
-
-		return nearSidePoint;
+	/**
+	 * bestimmt den Punt aus der Liste, welcher am weitesten oben liegt, also
+	 * den größten y-Wert hat
+	 * 
+	 * @param list
+	 *            die Liste der Punkte
+	 * @return der Punkt mit dem größten y-Wert
+	 */
+	protected Point getTopSidePoint(Collection<Point> list) {
+		return list.stream().max((a,b) -> (int) Math.floor(a.getY() - b.getY())).get();
 	}
 
-	protected Point getTopSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point topSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getY() > topSidePoint.getY()) {
-				topSidePoint = curr;
-			}
-		}
-
-		return topSidePoint;
-	}
-
-	protected Point getLowSidePoint(List<Point> list) {
-		Iterator<Point> iter = list.iterator();
-
-		Point lowSidePoint = iter.next();
-
-		while (iter.hasNext()) {
-			Point curr = iter.next();
-			if (curr.getY() < lowSidePoint.getY()) {
-				lowSidePoint = curr;
-			}
-		}
-
-		return lowSidePoint;
+	/**
+	 * bestimmt den Punt aus der Liste, welcher am weitesten unten liegt, also
+	 * den geringsten y-Wert hat
+	 * 
+	 * @param list
+	 *            die Liste der Punkte
+	 * @return der Punkt der am weitesten unten liegt
+	 */
+	protected Point getLowSidePoint(Collection<Point> list) {
+		return list.stream().min((a,b) -> (int) Math.floor(a.getY() - b.getY())).get();
 	}
 
 }

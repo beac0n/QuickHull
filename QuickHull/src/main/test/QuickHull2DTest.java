@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import main.Point;
 import main.Point2D;
 import main.QuickHull;
@@ -33,7 +35,7 @@ public class QuickHull2DTest extends QuickHullTest {
 		pointList.add(c);
 		pointList.add(d);
 
-		List<Point> currentBorderPoints = getBorderAndWriteToFile(pointList,
+		Collection<Point> currentBorderPoints = getBorderAndWriteToFile(pointList,
 				"2D"+outFilePre+"testPointsBestCase");
 
 		assertEquals(4, currentBorderPoints.size());
@@ -55,7 +57,7 @@ public class QuickHull2DTest extends QuickHullTest {
 			FileNotFoundException {
 		List<Point> pointList = getRandomSphereGaussianPoints(pointCap, false);
 
-		List<Point> border = getBorderAndWriteToFile(pointList,
+		Collection<Point> border = getBorderAndWriteToFile(pointList,
 				"2D"+outFilePre+"testPointsCircle");
 		assertEquals(pointList.size(), border.size());
 	}

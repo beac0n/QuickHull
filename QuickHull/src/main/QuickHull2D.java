@@ -1,8 +1,9 @@
 package main;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im
@@ -20,15 +21,13 @@ public class QuickHull2D extends QuickHull {
 	 *            Die Liste der gegebenen Punkte
 	 * @return eine Liste der Randpunkte
 	 */
-	public List<Point> getBorderPoints(List<Point> pointSetInput) {
-		List<Point> pointSet = new LinkedList<Point>(pointSetInput);
-
+	public Collection<Point> getBorderPoints(Collection<Point> points) {
 		List<Point> borderPoints = new LinkedList<Point>();
 
-		Point leftSidePoint = getLeftSidePoint(pointSet);
-		Point rightSidePoint = getRightSidePoint(pointSet);
+		Point leftSidePoint = getLeftSidePoint(points);
+		Point rightSidePoint = getRightSidePoint(points);
 
-		splitInUpperAndLower(leftSidePoint, rightSidePoint, pointSet,
+		splitInUpperAndLower(leftSidePoint, rightSidePoint, points,
 				borderPoints);
 
 		return borderPoints;
@@ -42,42 +41,35 @@ public class QuickHull2D extends QuickHull {
 	 * beiden Listen werden dann mit dem Quickhull-Algorithmus alle Randpunkte
 	 * berechnet. Die Randpunkte werden in einer übergebenen Liste gespeichert.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            der Punkt de am weitesten links liegt
-	 * @param rightSidePoint
+	 * @param right
 	 *            der Punkt der am weitesten rechts liegt
-	 * @param currentPointSet
+	 * @param points
 	 *            die Liste der Punkte
 	 * @param borderPoints
 	 *            die zu befüllende Liste, welche die Randpunkte darstellt
 	 */
-	private void splitInUpperAndLower(Point leftSidePoint,
-			Point rightSidePoint, List<Point> currentPointSet,
+	private void splitInUpperAndLower(Point left,
+			Point right, Collection<Point> points,
 			List<Point> borderPoints) {
-
-		currentPointSet.remove(leftSidePoint);
-		currentPointSet.remove(rightSidePoint);
 
 		List<Point> upperSet = new LinkedList<>();
 		List<Point> lowerSet = new LinkedList<>();
 
-		Iterator<Point> iter = currentPointSet.iterator();
-
-		while (iter.hasNext()) {
-			Point current = iter.next();
-
-			if (getDifferenceFromNormal(leftSidePoint, rightSidePoint, current) > 0) {
+		for (Point current : points) {
+			if (getDifferenceFromNormal(left, right, current) > 0) {
 				upperSet.add(current);
 			} else {
 				lowerSet.add(current);
 			}
 		}
+		
+		borderPoints.add(left);
+		calculateBorder(left, right, upperSet, borderPoints);
 
-		borderPoints.add(leftSidePoint);
-		calculateBorder(leftSidePoint, rightSidePoint, upperSet, borderPoints);
-
-		borderPoints.add(rightSidePoint);
-		calculateBorder(rightSidePoint, leftSidePoint, lowerSet, borderPoints);
+		borderPoints.add(right);
+		calculateBorder(right, left, lowerSet, borderPoints);
 	}
 
 	/**
@@ -90,17 +82,17 @@ public class QuickHull2D extends QuickHull {
 	 *            erster Punkt um Linie aufzuspannen
 	 * @param b
 	 *            zweiter Punkt um Linie aufzuspannen
-	 * @param upperCheck
+	 * @param check
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	private double getDifferenceFromNormal(Point a, Point b, Point upperCheck) {
+	private double getDifferenceFromNormal(Point a, Point b, Point check) {
 		// normale
 		double nx = -(b.getY() - a.getY());
 		double ny = b.getX() - a.getX();
 		// x - p
-		double Xaminusp = upperCheck.getX() - a.getX();
-		double Yaminusp = upperCheck.getY() - a.getY();
+		double Xaminusp = check.getX() - a.getX();
+		double Yaminusp = check.getY() - a.getY();
 		// (x-p) * n = 0 ==> falls punkt auf gerade
 		return Xaminusp * nx + Yaminusp * ny;
 	}
@@ -109,37 +101,33 @@ public class QuickHull2D extends QuickHull {
 	 * Rekursiver Teil des Quickhull-Algorithmuss, der nach und nach den Rand
 	 * der 2-Dimensionalen Punktwolke berechnet.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            linker Punkt der aufzuspannenden Linie
-	 * @param rightSidePoint
+	 * @param right
 	 *            rechter Punkt der aufzuspannenden Linie
-	 * @param pointSet
+	 * @param points
 	 *            momentane Liste der Punkte
 	 * @param borderPoints
 	 *            Liste der Randpunkte
 	 */
-	protected void calculateBorder(Point leftSidePoint, Point rightSidePoint,
-			List<Point> pointSet, List<Point> borderPoints) {
+	protected void calculateBorder(Point left, Point right,
+			List<Point> points, List<Point> borderPoints) {
 
-		pointSet.remove(leftSidePoint);
-		pointSet.remove(rightSidePoint);
-
-		if (pointSet.size() == 0)
+		if (points.size() == 0)
 			return;
 
-		Point uppestPoint = getUppestPoint(leftSidePoint, rightSidePoint,
-				pointSet);
-		pointSet.remove(uppestPoint);
+		Point uppestPoint = getUppestPoint(left, right,
+				points);
 
-		List<Point> leftUpperSet = getAllPointsOver(leftSidePoint, uppestPoint,
-				pointSet);
-		calculateBorder(leftSidePoint, uppestPoint, leftUpperSet, borderPoints);
+		List<Point> leftUpperSet = getAllPointsOver(left, uppestPoint,
+				points);
+		calculateBorder(left, uppestPoint, leftUpperSet, borderPoints);
 
 		borderPoints.add(uppestPoint);
 
 		List<Point> rightUpperSet = getAllPointsOver(uppestPoint,
-				rightSidePoint, pointSet);
-		calculateBorder(uppestPoint, rightSidePoint, rightUpperSet,
+				right, points);
+		calculateBorder(uppestPoint, right, rightUpperSet,
 				borderPoints);
 	}
 
@@ -147,31 +135,20 @@ public class QuickHull2D extends QuickHull {
 	 * Bestimmt alle Punkte, welcher oberhalb einer Linie liegen, die durch zwei
 	 * Punkte aufgespannt wird.
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            linker Punkt der Linie
-	 * @param rightSidePoint
+	 * @param right
 	 *            recher Punkt der Linie
-	 * @param upperSet
-	 *            Lister der Punkte
+	 * @param points
+	 *            Liste der Punkte
 	 * @return Liste der Punkte die oberhalb der Linie liegen
 	 */
-	protected List<Point> getAllPointsOver(Point leftSidePoint,
-			Point rightSidePoint, List<Point> upperSet) {
-		List<Point> returnValue = new LinkedList<Point>();
-
-		Iterator<Point> iter = upperSet.iterator();
-
-		while (iter.hasNext()) {
-			Point currPoint = iter.next();
-			double differenceFromNormal = getDifferenceFromNormal(
-					leftSidePoint, rightSidePoint, currPoint);
-
-			if (differenceFromNormal > 0) {
-				returnValue.add(currPoint);
-			}
-		}
-
-		return returnValue;
+	protected List<Point> getAllPointsOver(Point left, Point right,
+			List<Point> points) {
+		return points
+				.stream()
+				.filter(p -> getDifferenceFromNormal(left, right, p) > 0)
+				.collect(Collectors.toCollection(() -> new LinkedList<Point>()));
 	}
 
 	/**
@@ -179,34 +156,21 @@ public class QuickHull2D extends QuickHull {
 	 * den größten am weitesten von der Linie entfernt ist, welcher von zwei
 	 * Punkten aufgespannt wird
 	 * 
-	 * @param leftSidePoint
+	 * @param left
 	 *            linker Punkt der Linie
-	 * @param rightSidePoint
+	 * @param right
 	 *            rechter Punkt der Linie
-	 * @param currentPointSet
+	 * @param points
 	 *            die Punktliste
 	 * @return der Punkt der am weitesten von der Linie entfernt ist
 	 */
-	protected Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
-			List<Point> currentPointSet) {
-
-		Point uppestPoint = null;
-
-		double oldDifferenceFromNormal = -1;
-
-		Iterator<Point> iter = currentPointSet.iterator();
-
-		while (iter.hasNext()) {
-			Point currentPoint = iter.next();
-
-			double currentDifferenceFromNormal = getDifferenceFromNormal(
-					leftSidePoint, rightSidePoint, currentPoint);
-			if (currentDifferenceFromNormal > oldDifferenceFromNormal) {
-				uppestPoint = currentPoint;
-				oldDifferenceFromNormal = currentDifferenceFromNormal;
-			}
-		}
-
-		return uppestPoint;
+	protected Point getUppestPoint(Point left, Point right,
+			List<Point> points) {
+		return points
+				.stream()
+				.max((a, b) -> (int) Math.signum(
+						getDifferenceFromNormal(left, right, a) - 
+						getDifferenceFromNormal(left, right, b)))
+				.get();
 	}
 }

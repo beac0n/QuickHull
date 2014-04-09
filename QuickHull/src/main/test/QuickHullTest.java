@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -45,7 +46,7 @@ public abstract class QuickHullTest {
 				+ "'/> </Appearance> <PointSet> <Coordinate point='";
 	}
 
-	protected List<Point> getBorderAndWriteToFile(List<Point> pointList,
+	protected Collection<Point> getBorderAndWriteToFile(List<Point> pointList,
 			String filename) throws FileNotFoundException {
 		QuickHull qh = createQuickHullObject();
 
@@ -58,7 +59,7 @@ public abstract class QuickHullTest {
 		out.flush();
 
 		System.out.print("now calculating border points... ");
-		List<Point> border = qh.getBorderPoints(pointList);
+		Collection<Point> border = qh.getBorderPoints(pointList);
 		System.out.print("border points calculated, now writing them to "
 				+ filename + ".x3d... ");
 		Iterator<Point> iter = pointList.iterator();
@@ -93,7 +94,7 @@ public abstract class QuickHullTest {
 	}
 
 	private void writePointsToX3Dfile(String filename, String x3dFileHead,
-			List<Point> border, String x3dFileTail, Color color)
+			Collection<Point> border, String x3dFileTail, Color color)
 			throws FileNotFoundException {
 		PrintWriter out = new PrintWriter(filename + ".x3d");
 		out.print(getX3DfileHeadWithColor(color));
@@ -146,7 +147,7 @@ public abstract class QuickHullTest {
 		out.close();
 	}
 
-	private void writePointsToWriter(PrintWriter out, List<Point> border) {
+	private void writePointsToWriter(PrintWriter out, Collection<Point> border) {
 		Iterator<Point> iter;
 		iter = border.iterator();
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -48,7 +49,7 @@ public class QuickHull3DTest extends QuickHullTest {
 		pointList.add(g);
 		pointList.add(h);
 
-		List<Point> borderPoints = getBorderAndWriteToFile(pointList, "3D_testPointsBestCase");
+		Collection<Point> borderPoints = getBorderAndWriteToFile(pointList, "3D_testPointsBestCase");
 
 		assertEquals(8, borderPoints.size());
 		assertTrue(borderPoints.contains(a));
@@ -73,7 +74,7 @@ public class QuickHull3DTest extends QuickHullTest {
 	public void testPointsSphere() throws InterruptedException,
 			FileNotFoundException {
 		List<Point> pointList = getRandomSphereGaussianPoints(pointCap, true);
-		List<Point> border = getBorderAndWriteToFile(pointList,
+		Collection<Point> border = getBorderAndWriteToFile(pointList,
 				"3D_testPointsSphere");
 		assertTrue(border.containsAll(pointList));
 		assertEquals(pointList.size(), border.size());
@@ -103,7 +104,7 @@ public class QuickHull3DTest extends QuickHullTest {
 		pointList.add(d);
 
 		QuickHull3D qh3d = new QuickHull3D();
-		List<Point> bps = qh3d.getBorderPoints(pointList);
+		Collection<Point> bps = qh3d.getBorderPoints(pointList);
 
 		assertEquals(pointList.size(), bps.size());
 	}
