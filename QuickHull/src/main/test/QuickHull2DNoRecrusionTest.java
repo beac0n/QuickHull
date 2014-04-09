@@ -5,6 +5,10 @@ import main.QuickHull2DNoRecrusion;
 
 public class QuickHull2DNoRecrusionTest extends QuickHull2DTest {
 
+	{
+		 outFilePre = "_noRecrusion_";
+	}
+	
 	protected QuickHull createQuickHullObject() {
 		return new QuickHull2DNoRecrusion();
 	}

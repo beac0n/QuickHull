@@ -38,6 +38,7 @@ public class Point3D implements Point {
 	}
 
 	public boolean equals(Object obj) {
+		if(obj == null) return false;
 		Point p = (Point) obj;
 		return (getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ());
 	}

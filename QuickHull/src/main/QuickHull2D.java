@@ -155,7 +155,7 @@ public class QuickHull2D extends QuickHull {
 	 *            Lister der Punkte
 	 * @return Liste der Punkte die oberhalb der Linie liegen
 	 */
-	private List<Point> getAllPointsOver(Point leftSidePoint,
+	protected List<Point> getAllPointsOver(Point leftSidePoint,
 			Point rightSidePoint, List<Point> upperSet) {
 		List<Point> returnValue = new LinkedList<Point>();
 
@@ -187,7 +187,7 @@ public class QuickHull2D extends QuickHull {
 	 *            die Punktliste
 	 * @return der Punkt der am weitesten von der Linie entfernt ist
 	 */
-	private Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
+	protected Point getUppestPoint(Point leftSidePoint, Point rightSidePoint,
 			List<Point> currentPointSet) {
 
 		Point uppestPoint = null;

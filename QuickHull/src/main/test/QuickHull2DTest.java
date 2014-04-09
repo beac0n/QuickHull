@@ -15,6 +15,8 @@ import org.junit.Test;
 
 public class QuickHull2DTest extends QuickHullTest {
 
+	protected String outFilePre = "_";
+	
 	@Test
 	public void testPointsBestCase() throws IOException {
 
@@ -32,9 +34,9 @@ public class QuickHull2DTest extends QuickHullTest {
 		pointList.add(d);
 
 		List<Point> currentBorderPoints = getBorderAndWriteToFile(pointList,
-				"2D_testPointsBestCase");
+				"2D"+outFilePre+"testPointsBestCase");
 
-		assertTrue(currentBorderPoints.size() == 4);
+		assertEquals(4, currentBorderPoints.size());
 		assertTrue(currentBorderPoints.contains(a));
 		assertTrue(currentBorderPoints.contains(b));
 		assertTrue(currentBorderPoints.contains(c));
@@ -45,7 +47,7 @@ public class QuickHull2DTest extends QuickHullTest {
 	public void testPointsRandom() throws IOException, InterruptedException {
 		List<Point> pointList = new LinkedList<Point>();
 		pointList = getRandomGaussianPoints(pointCap, false);
-		getBorderAndWriteToFile(pointList, "2D_testPointsRandom");
+		getBorderAndWriteToFile(pointList, "2D"+outFilePre+"testPointsRandom");
 	}
 
 	@Test
@@ -54,7 +56,7 @@ public class QuickHull2DTest extends QuickHullTest {
 		List<Point> pointList = getRandomSphereGaussianPoints(pointCap, false);
 
 		List<Point> border = getBorderAndWriteToFile(pointList,
-				"2D_testPointsCircle");
+				"2D"+outFilePre+"testPointsCircle");
 		assertEquals(pointList.size(), border.size());
 	}
 

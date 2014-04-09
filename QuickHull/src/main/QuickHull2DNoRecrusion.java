@@ -24,6 +24,7 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 		Stack<Point> leftSidePointStack = new Stack<Point>();
 		Stack<Point> rightSidePointStack = new Stack<Point>();
 		Stack<List<Point>> pointSetStack = new Stack<List<Point>>();
+		Stack<Point> borderPointStack = new Stack<Point>();
 
 		leftSidePointStack.push(leftSidePoint);
 		rightSidePointStack.push(rightSidePoint);
@@ -33,11 +34,19 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 		Point currentRightSidePoint = null;
 		List<Point> currentPointSet = null;
 		Point uppestPoint = null;
-
+		Point currBorderPoint = null;
+		
 		while (!leftSidePointStack.isEmpty()) {
 			currentLeftSidePoint = leftSidePointStack.pop();
 			currentRightSidePoint = rightSidePointStack.pop();
 			currentPointSet = pointSetStack.pop();
+			if(!borderPointStack.empty()) {
+				currBorderPoint = borderPointStack.pop();
+			}
+			
+			if(currentLeftSidePoint.equals(currBorderPoint)) {
+				//borderPoints.add(currBorderPoint);
+			}
 
 			currentPointSet.remove(currentLeftSidePoint);
 			currentPointSet.remove(currentRightSidePoint);
@@ -51,6 +60,7 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 				List<Point> leftUpperSet = getAllPointsOver(
 						currentLeftSidePoint, uppestPoint, currentPointSet);
 
+				borderPointStack.push(uppestPoint);
 				borderPoints.add(uppestPoint);
 
 				List<Point> rightUpperSet = getAllPointsOver(uppestPoint,
