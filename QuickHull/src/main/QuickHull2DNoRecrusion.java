@@ -64,7 +64,7 @@ public class QuickHull2DNoRecrusion extends QuickHull2D {
 						currentRightSidePoint, currentPointSet);
 
 				// second recursive call
-				leftSidePointStack.push(uppestPoint);
+				leftSidePointStack.push(uppestPoint); 
 				rightSidePointStack.push(currentRightSidePoint);
 				pointSetStack.push(rightUpperSet);
 				borderPointStack.push(Optional.of(uppestPoint));

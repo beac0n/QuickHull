@@ -1,5 +1,8 @@
 package main;
 
+import java.awt.Color;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +23,67 @@ import java.util.stream.Collectors;
  */
 public class QuickHull3D extends QuickHull {
 
+	private PrintWriter out;
+
+	private String getX3DcolorString(Color color) {
+		String returnValue = String.valueOf(color.getRed() / 255) + " ";
+		returnValue += String.valueOf(color.getGreen() / 255) + " ";
+		returnValue += String.valueOf(color.getBlue() / 255);
+
+		return returnValue;
+	}
+
+	private void printCurrententPoints(Collection<Point> points) {
+		if (out == null)
+			try {
+				out = new PrintWriter("TEMP.x3d");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		out.print("<Shape><Appearance><Material emissiveColor='1 1 1'/> </Appearance>"
+				+ "<PointSet><Coordinate point='");
+
+		Iterator<Point> iter = points.iterator();
+
+		while (iter.hasNext()) {
+			Point cur = iter.next();
+			out.println(cur.getX() + " " + cur.getY() + " " + cur.getZ() + " ");
+		}
+
+		out.println("'/></PointSet></Shape>");
+
+		out.flush();
+	}
+
+	private void printShape(Point a, Point b, Point c) {
+		if (out == null)
+			try {
+				out = new PrintWriter("TEMP.x3d");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		double randColorR = (Math.random());
+		double randColorG = (Math.random());
+		double randColorB = (Math.random());
+
+		out.println("<Shape><IndexedFaceSet coordIndex='0 1 2'>"
+				+ "<Color color='" + randColorR + " " + randColorG + " "
+				+ randColorB + " " + randColorR + " " + randColorG + " "
+				+ randColorB + " " + randColorR + " " + randColorG + " "
+				+ randColorB + "'/>" + "<Coordinate point='");
+		out.println(a.getX() + " " + a.getY() + " " + a.getZ() + " ");
+		out.println(b.getX() + " " + b.getY() + " " + b.getZ() + " ");
+		out.println(c.getX() + " " + c.getY() + " " + c.getZ());
+		out.println("'/></IndexedFaceSet></Shape>");
+		out.println();
+
+		out.flush();
+	}
+
 	/**
 	 * Liefert für eine gegebene Liste an Punkten alle Randpunkte.
 	 * 
@@ -32,29 +96,28 @@ public class QuickHull3D extends QuickHull {
 		if (pointInput.size() < 5)
 			return pointInput;
 
-		HashSet<Point> points = new HashSet<Point>(pointInput);
+		ArrayList<Point> points = new ArrayList<Point>(pointInput);
 
-		List<Point> borderPoints = new LinkedList<Point>();
+		HashSet<Point> borderPoints = new HashSet<Point>(points.size());
 
 		List<Point> initHull = getInitialhull(points);
 
 		borderPoints.addAll(initHull);
-
 		points.removeAll(initHull);
 
-		HashSet<Point> behindSet = getAllPointsOver(initHull.get(2),
+		ArrayList<Point> behindSet = getAllPointsOver(initHull.get(2),
 				initHull.get(1), initHull.get(0), points);
 		points.removeAll(behindSet);
 
-		HashSet<Point> rightSet = getAllPointsOver(initHull.get(1),
+		ArrayList<Point> rightSet = getAllPointsOver(initHull.get(1),
 				initHull.get(3), initHull.get(0), points);
 		points.removeAll(rightSet);
 
-		HashSet<Point> leftSet = getAllPointsOver(initHull.get(3),
+		ArrayList<Point> leftSet = getAllPointsOver(initHull.get(3),
 				initHull.get(2), initHull.get(0), points);
 		points.removeAll(leftSet);
 
-		HashSet<Point> lowerSet = getAllPointsOver(initHull.get(2),
+		ArrayList<Point> lowerSet = getAllPointsOver(initHull.get(2),
 				initHull.get(3), initHull.get(1), points);
 		points.removeAll(lowerSet);
 
@@ -79,7 +142,7 @@ public class QuickHull3D extends QuickHull {
 	 *            Hüllenpunkte berechnet werden.
 	 * @return Liste mit den ersten 4 Randpunkten
 	 */
-	private List<Point> getInitialhull(HashSet<Point> points) {
+	private List<Point> getInitialhull(Collection<Point> points) {
 
 		// bestimme die zwei am weitesten entfernten punkte
 		Point left = getLeftSidePoint(points);
@@ -101,30 +164,30 @@ public class QuickHull3D extends QuickHull {
 		Collection<Point> nearPoints = getAllEqualZ(points, near);
 
 		List<TwoPointDistance> distances = new LinkedList<TwoPointDistance>();
-		
+
 		// if distant points lie on same dimension
-		Optional<TwoPointDistance> lrPoints = getMaxDistanceOfFixedDimension(leftPoints, rightPoints, false);
-		Optional<TwoPointDistance> tlPoints = getMaxDistanceOfFixedDimension(topPoints, lowPoints, false);
-		Optional<TwoPointDistance> fnPoints = getMaxDistanceOfFixedDimension(farPoints, nearPoints, true);
-		
-		if(lrPoints.isPresent()) {
+		Optional<TwoPointDistance> lrPoints = getMaxDistanceOfFixedDimension(
+				leftPoints, rightPoints, false);
+		Optional<TwoPointDistance> tlPoints = getMaxDistanceOfFixedDimension(
+				topPoints, lowPoints, false);
+		Optional<TwoPointDistance> fnPoints = getMaxDistanceOfFixedDimension(
+				farPoints, nearPoints, true);
+
+		if (lrPoints.isPresent()) {
 			distances.add(lrPoints.get());
-		}
-		else {
+		} else {
 			distances.add(getMaxDistanceOf(leftPoints, rightPoints));
 		}
-		
-		if(tlPoints.isPresent()) {
+
+		if (tlPoints.isPresent()) {
 			distances.add(tlPoints.get());
-		}
-		else {
+		} else {
 			distances.add(getMaxDistanceOf(topPoints, lowPoints));
 		}
-		
-		if(fnPoints.isPresent()) {
+
+		if (fnPoints.isPresent()) {
 			distances.add(fnPoints.get());
-		}
-		else {
+		} else {
 			distances.add(getMaxDistanceOf(farPoints, nearPoints));
 		}
 
@@ -169,8 +232,8 @@ public class QuickHull3D extends QuickHull {
 		return returnValue;
 	}
 
-	private Optional<TwoPointDistance> getMaxDistanceOfFixedDimension(Collection<Point> sideA,
-			Collection<Point> sideB, boolean isZ) {
+	private Optional<TwoPointDistance> getMaxDistanceOfFixedDimension(
+			Collection<Point> sideA, Collection<Point> sideB, boolean isZ) {
 		HashSet<TwoPointDistance> distances = new HashSet<TwoPointDistance>();
 
 		for (Point curA : sideA) {
@@ -186,13 +249,13 @@ public class QuickHull3D extends QuickHull {
 			}
 		}
 
-		return distances
-				.stream()
-				.max((a, b) -> (int) Math.signum(a.generateDistance()
+		return distances.stream().max(
+				(a, b) -> (int) Math.signum(a.generateDistance()
 						- b.generateDistance()));
 	}
 
-	private TwoPointDistance getMaxDistanceOf(Collection<Point> sideA, Collection<Point> sideB) {
+	private TwoPointDistance getMaxDistanceOf(Collection<Point> sideA,
+			Collection<Point> sideB) {
 		HashSet<TwoPointDistance> distances = new HashSet<TwoPointDistance>();
 
 		for (Point curA : sideA) {
@@ -208,17 +271,17 @@ public class QuickHull3D extends QuickHull {
 						- b.generateDistance())).get();
 	}
 
-	private Collection<Point> getAllEqualX(HashSet<Point> points, Point left) {
+	private Collection<Point> getAllEqualX(Collection<Point> points, Point left) {
 		return points.stream().filter(a -> a.getX() == left.getX())
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 
-	private Collection<Point> getAllEqualY(HashSet<Point> points, Point left) {
+	private Collection<Point> getAllEqualY(Collection<Point> points, Point left) {
 		return points.stream().filter(a -> a.getY() == left.getY())
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
 
-	private Collection<Point> getAllEqualZ(HashSet<Point> points, Point left) {
+	private Collection<Point> getAllEqualZ(Collection<Point> points, Point left) {
 		return points.stream().filter(a -> a.getZ() == left.getZ())
 				.collect(Collectors.toCollection(() -> new ArrayList<>()));
 	}
@@ -319,26 +382,24 @@ public class QuickHull3D extends QuickHull {
 	 *            Liste der Randpunkte
 	 */
 	private void calculateBorder(Point left, Point right, Point far,
-			HashSet<Point> points, List<Point> borderPoints) {
-		if (points.size() == 0)
+			ArrayList<Point> points, HashSet<Point> borderPoints) {
+		if (points.size() < 4) {
+			borderPoints.addAll(points);
 			return;
+		}
 
 		Point uppest = getUppestPoint(left, right, far, points);
 
-		points.remove(uppest);
 		borderPoints.add(uppest);
 
-		HashSet<Point> rightUpperList = getAllPointsOver(uppest, far, left,
+		ArrayList<Point> rightUpperList = getAllPointsOver(uppest, far, left,
 				points);
-		points.removeAll(rightUpperList);
 
-		HashSet<Point> leftUpperList = getAllPointsOver(left, right, uppest,
+		ArrayList<Point> leftUpperList = getAllPointsOver(left, right, uppest,
 				points);
-		points.removeAll(leftUpperList);
 
-		HashSet<Point> farUpperList = getAllPointsOver(right, far, uppest,
+		ArrayList<Point> farUpperList = getAllPointsOver(right, far, uppest,
 				points);
-		points.removeAll(farUpperList);
 
 		calculateBorder(uppest, far, left, rightUpperList, borderPoints);
 		calculateBorder(left, right, uppest, leftUpperList, borderPoints);
@@ -380,13 +441,20 @@ public class QuickHull3D extends QuickHull {
 	 *            die Punktmenge aus der die Punkte zu bestimmen sind
 	 * @return die Punkte oberhalb der Ebene
 	 */
-	private HashSet<Point> getAllPointsOver(Point left, Point right, Point far,
-			Collection<Point> points) {
-		return points
-				.stream()
-				.filter(currPoint -> getDifferenceFromNormal(left, right, far,
-						currPoint) > 0)
-				.collect(Collectors.toCollection(() -> new HashSet<Point>()));
+	private ArrayList<Point> getAllPointsOver(Point left, Point right,
+			Point far, Collection<Point> points) {
+
+		ArrayList<Point> retVal = new ArrayList<Point>(points.size());
+
+		points.stream()
+				.filter(currPoint -> getDifferenceFromNormal(left, right, far, currPoint) > 0)
+				.filter(currPoint -> currPoint.getOwner() == null || currPoint.getOwner().equals(points))
+				.forEach(currPoint -> {
+					retVal.add(currPoint);
+					currPoint.setOwner(retVal);
+				});
+
+		return retVal;
 	}
 
 	/**

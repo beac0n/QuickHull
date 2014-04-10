@@ -22,7 +22,7 @@ public abstract class QuickHullTest {
 	private Color normalPointsColor = new Color(255, 0, 0);
 	private Color borderPointsColor = new Color(255, 255, 255);
 
-	protected int pointCap = 10_000;
+	protected int pointCap = 1_000;
 	protected int pointCapHalf = pointCap / 2;
 
 	protected abstract QuickHull createQuickHullObject();

@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Collection;
+
 /**
  * Diese Klasse soll einen Punkt im zweidimensionalen Raum darstellen. Die
  * z-Achse ist hierbei immer 1
@@ -11,6 +13,7 @@ public class Point2D implements Point {
 
 	private double x;
 	private double y;
+	private Collection<Point> owner;
 
 	public Point2D(double x, double y) {
 		this.x = x;
@@ -47,5 +50,16 @@ public class Point2D implements Point {
 		if(obj == null) return false;
 		Point p = (Point) obj;
 		return (getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ());
+	}
+
+
+	@Override
+	public Collection<Point> getOwner() {
+		return owner;
+	}
+
+	@Override
+	public void setOwner(Collection<Point> owner) {
+		this.owner = owner;		
 	}
 }

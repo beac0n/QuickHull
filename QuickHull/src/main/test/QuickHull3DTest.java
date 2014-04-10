@@ -91,6 +91,7 @@ public class QuickHull3DTest extends QuickHullTest {
 				"3D_testPointsSphere");
 		assertTrue(border.containsAll(pointList));
 		assertEquals(pointList.size(), border.size());
+		
 	}
 
 	@Test

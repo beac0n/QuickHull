@@ -117,7 +117,7 @@ public class QuickHull2D extends QuickHull {
 	 *            Liste der Randpunkte
 	 */
 	protected void calculateBorder(Point left, Point right,
-			List<Point> points, List<Point> borderPoints) {
+			List<Point> points, List<Point> borderPoints) { 
 
 		if (points.size() == 0) return;
 

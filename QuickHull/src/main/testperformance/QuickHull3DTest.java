@@ -47,7 +47,7 @@ public class QuickHull3DTest extends QuickHullTest {
 			pointList.add(backTopLeft);
 			pointList.add(backTopRight);
 
-			System.out.println(i + " points: " + timeForPoints(pointList, 20)
+			System.out.println(i + " points: " + timeForPoints(pointList, 5)
 					+ " ms");
 
 		}
@@ -62,7 +62,7 @@ public class QuickHull3DTest extends QuickHullTest {
 		for (int i = 1000; i < pointCap; i *= 2) {
 			pointList = new LinkedList<Point>();
 			pointList = getRandomGaussianPoints(i, true);
-			System.out.println(i + " points: " + timeForPoints(pointList, 20)
+			System.out.println(i + " points: " + timeForPoints(pointList, 5)
 					+ " ms");
 		}
 	}
@@ -95,7 +95,7 @@ public class QuickHull3DTest extends QuickHullTest {
 				}
 			}
 
-			System.out.println(i + " points: " + timeForPoints(pointList, 20)
+			System.out.println(i + " points: " + timeForPoints(pointList, 5)
 					+ " ms");
 		}
 	}
