@@ -1,10 +1,13 @@
-package main;
+package main.QuickHull2D;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import main.QuickHull.Point;
+import main.QuickHull.QuickHull;
 
 /**
  * Klasse, welche das Berechnen der Randpunkte einer Punktwolke im
@@ -26,7 +29,7 @@ public class QuickHull2D extends QuickHull {
 		if(pointsInput.size() < 4) return pointsInput;
 		
 		List<Point> borderPoints = new LinkedList<Point>();		
-		List<Point> points = new ArrayList<Point>(pointsInput);
+		List<Point> points = new LinkedList<Point>(pointsInput);
 
 		Point leftSidePoint = getLeftSidePoint(points);
 		Point rightSidePoint = getRightSidePoint(points);

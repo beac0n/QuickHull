@@ -1,20 +1,24 @@
-package main.testperformance;
+package main.QuickHull.test.performance;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import main.Point;
-import main.Point3D;
-import main.QuickHull;
-import main.QuickHull3D;
+
+import main.QuickHull.Point;
+import main.QuickHull.QuickHull;
+import main.QuickHull3D.Point3D;
+import main.QuickHull3D.QuickHull3D;
 
 import org.junit.Test;
 
 public class QuickHull3DTest extends QuickHullTest {
 
+	
+	
 	@Test
 	public void testPointsBestCasePerformance() throws IOException {
 		System.out.println("=== testPointsBestCasePerformance ===");
@@ -47,22 +51,19 @@ public class QuickHull3DTest extends QuickHullTest {
 			pointList.add(backTopLeft);
 			pointList.add(backTopRight);
 
-			System.out.println(i + " points: " + timeForPoints(pointList, 5)
+			System.out.println(i + " points: " + timeForPoints(pointList, rounds)
 					+ " ms");
-
 		}
-
 	}
 
 	@Test
 	public void testPointsRandomPerformance() throws FileNotFoundException {
 		System.out.println("=== testPointsRandomPerformance ===");
-		List<Point> pointList;
+		HashSet<Point> pointList;
 
 		for (int i = 1000; i < pointCap; i *= 2) {
-			pointList = new LinkedList<Point>();
 			pointList = getRandomGaussianPoints(i, true);
-			System.out.println(i + " points: " + timeForPoints(pointList, 5)
+			System.out.println(i + " points: " + timeForPoints(pointList, rounds)
 					+ " ms");
 		}
 	}
@@ -71,31 +72,16 @@ public class QuickHull3DTest extends QuickHullTest {
 	public void testPointsSpherePerformance() throws InterruptedException,
 			FileNotFoundException {
 		System.out.println("=== testPointsSpherePerformance ===");
-		List<Point> pointList = new ArrayList<Point>();
+		HashSet<Point> pointList = new HashSet<Point>();
 
 		Random rand = new Random();
 
 		for (int i = 1000; i < pointCap; i *= 2) {
-			for (int j = 0; j < i; ++j) {
-				double tempX = rand.nextGaussian();
-				double tempY = rand.nextGaussian();
-				double tempZ = rand.nextGaussian();
+			
+			pointList = getRandomSphereGaussianPoints(i);
 
-				double vectorLength = Math.sqrt(tempX * tempX + tempY * tempY
-						+ tempZ * tempZ);
-
-				tempX = tempX / vectorLength;
-				tempY = tempY / vectorLength;
-				tempZ = tempZ / vectorLength;
-
-				Point tempPoint = new Point3D(tempX, tempY, tempZ);
-
-				if (!pointList.contains(tempPoint)) {
-					pointList.add(tempPoint);
-				}
-			}
-
-			System.out.println(i + " points: " + timeForPoints(pointList, 5)
+			System.out.print(i + " points: " );
+			System.out.println(timeForPoints(pointList, rounds)
 					+ " ms");
 		}
 	}

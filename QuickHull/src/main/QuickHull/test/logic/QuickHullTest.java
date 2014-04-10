@@ -1,4 +1,4 @@
-package main.test;
+package main.QuickHull.test.logic;
 
 import java.awt.Color;
 import java.io.FileNotFoundException;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import main.Point;
-import main.Point3D;
-import main.QuickHull;
+import main.QuickHull.Point;
+import main.QuickHull.QuickHull;
+import main.QuickHull3D.Point3D;
 
 public abstract class QuickHullTest {
 
@@ -22,8 +22,10 @@ public abstract class QuickHullTest {
 	private Color normalPointsColor = new Color(255, 0, 0);
 	private Color borderPointsColor = new Color(255, 255, 255);
 
-	protected int pointCap = 1_000;
+	protected int pointCap = 3_000_000;
 	protected int pointCapHalf = pointCap / 2;
+	
+	protected String outFilePre = "_";
 
 	protected abstract QuickHull createQuickHullObject();
 
@@ -158,35 +160,26 @@ public abstract class QuickHullTest {
 		}
 	}
 
-	protected List<Point> getRandomSphereGaussianPoints(long pointsCount,
-			boolean is3D) {
-		Set<Point> pointList = new HashSet<Point>();
+	protected HashSet<Point> getRandomSphereGaussianPoints(long pointsCount) {
+		HashSet<Point> pointList = new HashSet<Point>();
 
 		Random rand = new Random();
 
 		for (int i = 0; i < pointsCount; ++i) {
 			double tempX = rand.nextGaussian() * 10000;
 			double tempY = rand.nextGaussian() * 10000;
-			double tempZ = 1.0;
-			if (is3D)
-				tempZ = rand.nextGaussian() * 10000;
+			double tempZ = rand.nextGaussian() * 10000;
 
-			double len = Math.sqrt(tempX * tempX + tempY * tempY);
-			if (is3D)
-				len = Math.sqrt(tempX * tempX + tempY * tempY + tempZ * tempZ);
+			double len = Math.sqrt(tempX * tempX + tempY * tempY + tempZ * tempZ);
 
 			tempX /= len;
 			tempY /= len;
-			if (is3D)
-				tempZ /= len;
+			tempZ /= len;
 
 			pointList.add(new Point3D(tempX, tempY, tempZ));
 		}
 
-		List<Point> retVal = new ArrayList<Point>();
-		retVal.addAll(pointList);
-
-		return retVal;
+		return pointList;
 	}
 
 	protected List<Point> getRandomSpecialSphereGaussianPoints(

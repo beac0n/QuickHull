@@ -1,4 +1,4 @@
-package main.test;
+package main.QuickHull.test.logic;
 
 import static org.junit.Assert.*;
 
@@ -6,19 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import main.Point;
-import main.Point2D;
-import main.QuickHull;
-import main.QuickHull2D;
+import main.QuickHull.Point;
+import main.QuickHull.QuickHull;
+import main.QuickHull2D.Point2D;
+import main.QuickHull2D.QuickHull2D;
 
 import org.junit.Test;
 
 public class QuickHull2DTest extends QuickHullTest {
-
-	protected String outFilePre = "_";
 
 	@Test
 	public void testPointsBestCase() throws IOException {
@@ -28,8 +27,8 @@ public class QuickHull2DTest extends QuickHullTest {
 		Point c = new Point2D(pointCap, pointCap);
 		Point d = new Point2D(pointCap, -pointCap);
 
-		List<Point> pointList = getRandomPoints(-pointCap / 2, pointCap,
-				-pointCap / 2, pointCap, pointCap - 4);
+		HashSet<Point> pointList 
+		= getRandomPoints(-pointCap / 2, pointCap, -pointCap / 2, pointCap, pointCap - 4);
 
 		pointList.add(a);
 		pointList.add(b);
@@ -75,9 +74,9 @@ public class QuickHull2DTest extends QuickHullTest {
 		return new QuickHull2D();
 	}
 
-	protected List<Point> getRandomPoints(int xMin, int rangeX, int yMin,
+	protected HashSet<Point> getRandomPoints(int xMin, int rangeX, int yMin,
 			int rangeY, int count) {
-		List<Point> pointList = new LinkedList<Point>();
+		HashSet<Point> pointList = new HashSet<Point>();
 
 		for (int i = 0; i < count; ++i) {
 			double tempX = Math.random() * rangeX + xMin;

@@ -1,4 +1,4 @@
-package main;
+package main.QuickHull;
 
 import java.util.Collection;
 

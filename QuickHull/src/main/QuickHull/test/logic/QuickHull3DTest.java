@@ -1,4 +1,4 @@
-package main.test;
+package main.QuickHull.test.logic;
 
 import static org.junit.Assert.*;
 
@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import main.Point;
-import main.Point3D;
-import main.QuickHull;
-import main.QuickHull3D;
+import main.QuickHull.Point;
+import main.QuickHull.QuickHull;
+import main.QuickHull3D.Point3D;
+import main.QuickHull3D.QuickHull3D;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,10 +28,10 @@ public class QuickHull3DTest extends QuickHullTest {
 
 		Point a = new Point3D(-pointCap, -pointCap, -pointCap);
 		Point b = new Point3D(pointCap, pointCap, -pointCap);
-		Point c = new Point3D(-pointCap - 1, pointCap, -pointCap);
+		Point c = new Point3D(-pointCap, pointCap, -pointCap);
 		Point d = new Point3D(pointCap, -pointCap, -pointCap);
 
-		Point e = new Point3D(-pointCap, -pointCap, pointCap + 1);
+		Point e = new Point3D(-pointCap, -pointCap, pointCap);
 		Point f = new Point3D(pointCap, pointCap, pointCap);
 		Point g = new Point3D(-pointCap, pointCap, pointCap);
 		Point h = new Point3D(pointCap, -pointCap, pointCap);
@@ -62,7 +62,7 @@ public class QuickHull3DTest extends QuickHullTest {
 		pointList.add(h);
 
 		Collection<Point> borderPoints = getBorderAndWriteToFile(pointList,
-				"3D_testPointsBestCase");
+				"3D"+outFilePre+"testPointsBestCase");
 
 		assertEquals(8, borderPoints.size());
 		assertTrue(borderPoints.contains(a));
@@ -80,15 +80,15 @@ public class QuickHull3DTest extends QuickHullTest {
 	public void testPointsRandom() throws IOException, InterruptedException {
 		List<Point> pointList = new LinkedList<Point>();
 		pointList = getRandomGaussianPoints(pointCap, true);
-		getBorderAndWriteToFile(pointList, "3D_testPointsRandom");
+		getBorderAndWriteToFile(pointList, "3D"+outFilePre+"testPointsRandom");
 	}
 
 	@Test
 	public void testPointsSphere() throws InterruptedException,
 			FileNotFoundException {
-		List<Point> pointList = getRandomSphereGaussianPoints(pointCap, true);
+		HashSet<Point> pointList = getRandomSphereGaussianPoints(pointCap);
 		Collection<Point> border = getBorderAndWriteToFile(pointList,
-				"3D_testPointsSphere");
+				"3D"+outFilePre+"testPointsSphere");
 		assertTrue(border.containsAll(pointList));
 		assertEquals(pointList.size(), border.size());
 		
@@ -99,7 +99,7 @@ public class QuickHull3DTest extends QuickHullTest {
 			FileNotFoundException {
 		List<Point> pointList = getRandomSpecialSphereGaussianPoints(pointCap,
 				true);
-		getBorderAndWriteToFile(pointList, "3D_testPointsSpecialSphere");
+		getBorderAndWriteToFile(pointList, "3D"+outFilePre+"testPointsSpecialSphere");
 
 	}
 
@@ -127,7 +127,7 @@ public class QuickHull3DTest extends QuickHullTest {
 			int rangeY, int zMin, int rangeZ, int count) {
 		HashSet<Point> pointList = new HashSet<Point>();
 
-		for (int i = 0; i < count; ++i) {
+		for (int i = 0; i < count; i++) {
 			double tempX = Math.random() * rangeX + xMin;
 			double tempY = Math.random() * rangeY + yMin;
 			double tempZ = Math.random() * rangeZ + zMin;

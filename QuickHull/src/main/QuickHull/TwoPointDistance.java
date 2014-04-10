@@ -1,4 +1,4 @@
-package main;
+package main.QuickHull;
 
 public class TwoPointDistance {
 	private Point a;
