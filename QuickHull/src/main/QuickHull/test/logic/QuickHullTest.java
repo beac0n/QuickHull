@@ -24,7 +24,7 @@ public abstract class QuickHullTest {
 
 	protected int pointCap = 3_000_000;
 	protected int pointCapHalf = pointCap / 2;
-	
+
 	protected String outFilePre = "_";
 
 	protected abstract QuickHull createQuickHullObject();
@@ -48,8 +48,9 @@ public abstract class QuickHullTest {
 				+ "'/> </Appearance> <PointSet> <Coordinate point='";
 	}
 
-	protected Collection<Point> getBorderAndWriteToFile(Collection<Point> points,
-			String filename) throws FileNotFoundException {
+	protected Collection<Point> getBorderAndWriteToFile(
+			Collection<Point> points, String filename)
+			throws FileNotFoundException {
 		QuickHull qh = createQuickHullObject();
 
 		PrintWriter out = new PrintWriter(filename + ".x3d");
@@ -60,10 +61,14 @@ public abstract class QuickHullTest {
 
 		out.flush();
 
-		System.out.print("now calculating border points... ");
+		System.out.print("now calculating convex hull... ");
+		long startTime = System.nanoTime();
 		Collection<Point> border = qh.getBorderPoints(points);
-		System.out.print("border points calculated, now writing them to "
-				+ filename + ".x3d... ");
+		long endTime = System.nanoTime();
+		double timeInMs = (endTime - startTime) / 1_000_000d;
+
+		System.out.print("convex hull calculated, took " + timeInMs
+				+ " ms, now writing to " + filename + ".x3d... ");
 		Iterator<Point> iter = points.iterator();
 
 		while (iter.hasNext()) {
@@ -131,16 +136,21 @@ public abstract class QuickHullTest {
 			}
 
 			++i;
+			out.flush();
 		}
 
 		out.write("<Shape><IndexedLineSet coordIndex=\"");
 		out.write(indexString.toString());
+		out.flush();
 		out.write("0\" colorIndex=\"");
 		out.write(indexString.toString());
+		out.flush();
 		out.write("0\"><Color color=\"");
 		out.write(colorsString.toString());
+		out.flush();
 		out.write("\"/><Coordinate point=\"");
 		out.write(pointString.toString());
+		out.flush();
 		out.write("\"/></IndexedLineSet></Shape>");
 
 		out.write("</Scene></X3D>");
@@ -170,7 +180,8 @@ public abstract class QuickHullTest {
 			double tempY = rand.nextGaussian() * 10000;
 			double tempZ = rand.nextGaussian() * 10000;
 
-			double len = Math.sqrt(tempX * tempX + tempY * tempY + tempZ * tempZ);
+			double len = Math.sqrt(tempX * tempX + tempY * tempY + tempZ
+					* tempZ);
 
 			tempX /= len;
 			tempY /= len;

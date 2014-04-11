@@ -25,10 +25,11 @@ public class QuickHull2D extends QuickHull {
 	 *            Die Liste der gegebenen Punkte
 	 * @return eine Liste der Randpunkte
 	 */
-	public Collection<Point> getBorderPoints(Collection<Point> pointsInput) {		
-		if(pointsInput.size() < 4) return pointsInput;
-		
-		List<Point> borderPoints = new LinkedList<Point>();		
+	public Collection<Point> getBorderPoints(Collection<Point> pointsInput) {
+		if (pointsInput.size() < 4)
+			return pointsInput;
+
+		List<Point> borderPoints = new LinkedList<Point>();
 		List<Point> points = new LinkedList<Point>(pointsInput);
 
 		Point leftSidePoint = getLeftSidePoint(points);
@@ -57,23 +58,24 @@ public class QuickHull2D extends QuickHull {
 	 * @param borderPoints
 	 *            die zu befüllende Liste, welche die Randpunkte darstellt
 	 */
-	private void splitInUpperAndLower(Point left,
-			Point right, Collection<Point> points,
-			List<Point> borderPoints) {
+	private void splitInUpperAndLower(Point left, Point right,
+			Collection<Point> points, List<Point> borderPoints) {
 
 		int pointsSize = points.size();
-		
+
 		List<Point> upperSet = new ArrayList<Point>(pointsSize);
 		List<Point> lowerSet = new ArrayList<Point>(pointsSize);
 
-		for (Point current : points) {
-			if (getDifferenceFromNormal(left, right, current) > 0) {
+		points.stream().forEach(current -> {
+			double diffFromNormal = getDifferenceFromNormal(left, right, current);
+			
+			if (diffFromNormal > 0) {
 				upperSet.add(current);
-			} else {
+			} else if (diffFromNormal < 0){
 				lowerSet.add(current);
 			}
-		}
-		
+		});
+
 		borderPoints.add(left);
 		calculateBorder(left, right, upperSet, borderPoints);
 
@@ -119,12 +121,13 @@ public class QuickHull2D extends QuickHull {
 	 * @param borderPoints
 	 *            Liste der Randpunkte
 	 */
-	protected void calculateBorder(Point left, Point right,
-			List<Point> points, List<Point> borderPoints) { 
+	protected void calculateBorder(Point left, Point right, List<Point> points,
+			List<Point> borderPoints) {
 
-		if (points.size() == 0) return;
+		if (points.size() == 0)
+			return;
 
-		Point uppestPoint = getUppestPoint(left, right,	points);
+		Point uppestPoint = getUppestPoint(left, right, points);
 
 		List<Point> leftUpperSet = getAllPointsOver(left, uppestPoint, points);
 		calculateBorder(left, uppestPoint, leftUpperSet, borderPoints);
@@ -152,7 +155,9 @@ public class QuickHull2D extends QuickHull {
 		return points
 				.stream()
 				.filter(p -> getDifferenceFromNormal(left, right, p) > 0)
-				.collect(Collectors.toCollection(() -> new ArrayList<Point>(points.size())));
+				.collect(
+						Collectors.toCollection(() -> new ArrayList<Point>(
+								points.size())));
 	}
 
 	/**
@@ -168,13 +173,11 @@ public class QuickHull2D extends QuickHull {
 	 *            die Punktliste
 	 * @return der Punkt der am weitesten von der Linie entfernt ist
 	 */
-	protected Point getUppestPoint(Point left, Point right,
-			List<Point> points) {
+	protected Point getUppestPoint(Point left, Point right, List<Point> points) {
 		return points
 				.stream()
-				.max((a, b) -> (int) Math.signum(
-						getDifferenceFromNormal(left, right, a) - 
-						getDifferenceFromNormal(left, right, b)))
+				.max((a, b) -> (int) Math.signum(getDifferenceFromNormal(left,
+						right, a) - getDifferenceFromNormal(left, right, b)))
 				.get();
 	}
 }

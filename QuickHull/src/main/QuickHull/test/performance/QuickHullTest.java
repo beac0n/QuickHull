@@ -30,15 +30,15 @@ public abstract class QuickHullTest {
 	}
 
 	protected double measureTimeOnce(Collection<Point> pointList) {
-		long startTime = System.nanoTime();
-
 		QuickHull qh = createQuickHullObject();
+		
+		long startTime = System.nanoTime();
 		qh.getBorderPoints(pointList);
-
 		long stopTime = System.nanoTime();
+		
 		long elapsedTime = stopTime - startTime;
 
-		return elapsedTime / 1_000_000;
+		return elapsedTime / 1_000_000d;
 	}
 
 	protected HashSet<Point> getRandomSphereGaussianPoints(long pointsCount) {

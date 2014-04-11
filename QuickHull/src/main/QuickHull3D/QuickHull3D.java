@@ -30,13 +30,14 @@ public class QuickHull3D extends QuickHull {
 
 	private PrintWriter out;
 
-	private void printPointsAndShape(Point a, Point b, Point c, Collection<Point> points) {
-		
+	private void printPointsAndShape(Point a, Point b, Point c,
+			Collection<Point> points) {
+
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		
+
 		if (out == null)
 			try {
-				out = new PrintWriter(timestamp.toString()+".x3d");
+				out = new PrintWriter(timestamp.toString() + ".x3d");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -84,23 +85,26 @@ public class QuickHull3D extends QuickHull {
 	 * @return eine Liste der Randpunkte
 	 */
 	public Collection<Point> getBorderPoints(Collection<Point> pointInput) {
-		if (pointInput.size() < 5) return pointInput;
+		if (pointInput.size() < 5)
+			return pointInput;
 
 		LinkedList<Point> points = new LinkedList<Point>(pointInput);
-		HashSet<Point> convexHull = new HashSet<Point>(points.size()*2);
+		HashSet<Point> convexHull = new HashSet<Point>(points.size() * 2);
 
 		List<Point> initHull = getInitialhull(points);
 
 		convexHull.addAll(initHull);
 
-		Collection<Point> firstCloud 
-		= getAllPointsOver(initHull.get(2), initHull.get(1), initHull.get(0), points);
+		Collection<Point> firstCloud = getAllPointsOver(initHull.get(2),
+				initHull.get(1), initHull.get(0), points);
 
-		Collection<Point> secondCloud 
-		= getAllPointsOver(initHull.get(0), initHull.get(1), initHull.get(2), points);
+		Collection<Point> secondCloud = getAllPointsOver(initHull.get(0),
+				initHull.get(1), initHull.get(2), points);
 
-		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0), firstCloud, convexHull);
-		calculateBorder(initHull.get(0), initHull.get(1), initHull.get(2), secondCloud, convexHull);
+		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0),
+				firstCloud, convexHull);
+		calculateBorder(initHull.get(0), initHull.get(1), initHull.get(2),
+				secondCloud, convexHull);
 
 		return convexHull;
 	}
@@ -316,7 +320,7 @@ public class QuickHull3D extends QuickHull {
 	protected void calculateBorder(Point left, Point right, Point far,
 			Collection<Point> points, Collection<Point> convexHull) {
 
-		//printPointsAndShape(left, right, far, points);
+		// printPointsAndShape(left, right, far, points);
 
 		if (points.size() < 4) {
 			convexHull.addAll(points);
@@ -327,14 +331,24 @@ public class QuickHull3D extends QuickHull {
 
 		convexHull.add(uppest);
 
-		Collection<Point> rightUpperList = getAllPointsOver(uppest, far, left,
-				points);
+		Collection<Point> rightUpperList = new LinkedList<Point>(); //getAllPointsOver(uppest, far, left, points);
 
-		Collection<Point> leftUpperList = getAllPointsOver(left, right, uppest,
-				points);
+		Collection<Point> leftUpperList = new LinkedList<Point>();//getAllPointsOver(left, right, uppest, points);
 
-		Collection<Point> farUpperList = getAllPointsOver(right, far, uppest,
-				points);
+		Collection<Point> farUpperList = new LinkedList<Point>();//getAllPointsOver(right, far, uppest, points);
+
+		points.stream().forEach(currPoint -> 
+		{
+			if(getDifferenceFromNormal(uppest, far, left, currPoint) > 0) {
+				rightUpperList.add(currPoint);
+			}
+			else if(getDifferenceFromNormal(left, right, uppest, currPoint) > 0) {
+				leftUpperList.add(currPoint);
+			}
+			else if(getDifferenceFromNormal(right, far, uppest, currPoint) > 0) {
+				farUpperList.add(currPoint);
+			}
+		});
 
 		calculateBorder(uppest, far, left, rightUpperList, convexHull);
 		calculateBorder(left, right, uppest, leftUpperList, convexHull);
@@ -410,7 +424,8 @@ public class QuickHull3D extends QuickHull {
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	private double getDifferenceFromNormal(Point left, Point right, Point far, Point x) {
+	private double getDifferenceFromNormal(Point left, Point right, Point far,
+			Point x) {
 		// Ebenengleichung normale n = (q-p) x (r-p)
 
 		// q-p
