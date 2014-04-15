@@ -15,7 +15,6 @@ public class Point3D implements Point {
 	private double x;
 	private double y;
 	private double z;
-	private Collection<Point> owner;
 
 	public Point3D(double x, double y, double z) {
 		this.x = x;
@@ -54,17 +53,6 @@ public class Point3D implements Point {
 		if(obj == null) return false;
 		Point p = (Point) obj;
 		return (getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ());
-	}
-
-
-	@Override
-	public Collection<Point> getOwner() {
-		return owner;
-	}
-
-	@Override
-	public void setOwner(Collection<Point> owner) {
-		this.owner = owner;		
 	}
 
 }

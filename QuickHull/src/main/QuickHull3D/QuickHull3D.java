@@ -88,25 +88,45 @@ public class QuickHull3D extends QuickHull {
 		if (pointInput.size() < 5)
 			return pointInput;
 
-		LinkedList<Point> points = new LinkedList<Point>(pointInput);
-		HashSet<Point> convexHull = new HashSet<Point>(points.size() * 2);
-
-		List<Point> initHull = getInitialhull(points);
-
+		Collection<Point> points = initCloud(pointInput);
+		Collection<Point> convexHull = initConvexHull(points);
+		Collection<Point> initHull = getInitialhull(points);
 		convexHull.addAll(initHull);
+		
+		Iterator<Point> iter = initHull.iterator();		
+		Point a = iter.next();
+		Point b = iter.next();
+		Point c = iter.next();		
 
-		Collection<Point> firstCloud = getAllPointsOver(initHull.get(2),
-				initHull.get(1), initHull.get(0), points);
+		Collection<Point> firstCloud = initCloud();
+		Collection<Point> secondCloud = initCloud();		
+		
+		points.stream().forEach(curPoint -> 
+		{
+			if(getDifferenceFromNormal(c, b, a, curPoint) > 0) {
+				firstCloud.add(curPoint);
+			}
+			else if(getDifferenceFromNormal(a, b, c, curPoint) > 0) {
+				secondCloud.add(curPoint);
+			}
+		});
 
-		Collection<Point> secondCloud = getAllPointsOver(initHull.get(0),
-				initHull.get(1), initHull.get(2), points);
-
-		calculateBorder(initHull.get(2), initHull.get(1), initHull.get(0),
-				firstCloud, convexHull);
-		calculateBorder(initHull.get(0), initHull.get(1), initHull.get(2),
-				secondCloud, convexHull);
+		calculateBorder(c, b, a, firstCloud, convexHull);
+		calculateBorder(a, b, c, secondCloud, convexHull);
 
 		return convexHull;
+	}
+	
+	private Collection<Point> initConvexHull(Collection<Point> cloud) {
+		return new HashSet<Point>(cloud.size()*2);
+	}
+	
+	private Collection<Point> initCloud() {
+		return new ArrayList<Point>();
+	}
+	
+	private Collection<Point> initCloud(Collection<Point> input) {
+		return new ArrayList<Point>(input);
 	}
 
 	/**
@@ -118,7 +138,7 @@ public class QuickHull3D extends QuickHull {
 	 *            Hüllenpunkte berechnet werden.
 	 * @return Liste mit den ersten 4 Randpunkten
 	 */
-	private List<Point> getInitialhull(Collection<Point> points) {
+	private Collection<Point> getInitialhull(Collection<Point> points) {
 
 		// bestimme die zwei am weitesten entfernten punkte
 		Point left = getLeftSidePoint(points);
@@ -183,13 +203,13 @@ public class QuickHull3D extends QuickHull {
 				maxsecond);
 		points.remove(maxdistPointLine);
 
-		List<Point> returnValue = new ArrayList<Point>();
+		Collection<Point> cloud = initCloud();
 
-		returnValue.add(maxfirst);
-		returnValue.add(maxsecond);
-		returnValue.add(maxdistPointLine);
+		cloud.add(maxfirst);
+		cloud.add(maxsecond);
+		cloud.add(maxdistPointLine);
 
-		return returnValue;
+		return cloud;
 	}
 
 	private Optional<TwoPointDistance> getMaxDistanceOfFixedDimension(
@@ -315,7 +335,7 @@ public class QuickHull3D extends QuickHull {
 	 * @param points
 	 *            momentane Liste der Punkte
 	 * @param convexHull
-	 *            Liste der Randpunkte
+	 *            Liste der konvexen Hülle
 	 */
 	protected void calculateBorder(Point left, Point right, Point far,
 			Collection<Point> points, Collection<Point> convexHull) {
@@ -327,32 +347,29 @@ public class QuickHull3D extends QuickHull {
 			return;
 		}
 
-		Point uppest = getUppestPoint(left, right, far, points);
+		Point mdPoint = getMostDistantPoint(left, right, far, points);
+		convexHull.add(mdPoint);
 
-		convexHull.add(uppest);
-
-		Collection<Point> rightUpperList = new LinkedList<Point>(); //getAllPointsOver(uppest, far, left, points);
-
-		Collection<Point> leftUpperList = new LinkedList<Point>();//getAllPointsOver(left, right, uppest, points);
-
-		Collection<Point> farUpperList = new LinkedList<Point>();//getAllPointsOver(right, far, uppest, points);
-
-		points.stream().forEach(currPoint -> 
+		Collection<Point> firstCloud = initCloud();
+		Collection<Point> secondCloud = initCloud();
+		Collection<Point> thirdCloud = initCloud();
+		
+		points.stream().forEach(curPoint -> 
 		{
-			if(getDifferenceFromNormal(uppest, far, left, currPoint) > 0) {
-				rightUpperList.add(currPoint);
+			if(getDifferenceFromNormal(mdPoint, far, left, curPoint) > 0) {
+				firstCloud.add(curPoint);
 			}
-			else if(getDifferenceFromNormal(left, right, uppest, currPoint) > 0) {
-				leftUpperList.add(currPoint);
+			else if(getDifferenceFromNormal(left, right, mdPoint, curPoint) > 0) {
+				secondCloud.add(curPoint);
 			}
-			else if(getDifferenceFromNormal(right, far, uppest, currPoint) > 0) {
-				farUpperList.add(currPoint);
+			else if(getDifferenceFromNormal(right, far, mdPoint, curPoint) > 0) {
+				thirdCloud.add(curPoint);
 			}
 		});
 
-		calculateBorder(uppest, far, left, rightUpperList, convexHull);
-		calculateBorder(left, right, uppest, leftUpperList, convexHull);
-		calculateBorder(right, far, uppest, farUpperList, convexHull);
+		calculateBorder(mdPoint, far, left, firstCloud, convexHull);
+		calculateBorder(left, right, mdPoint, secondCloud, convexHull);
+		calculateBorder(right, far, mdPoint, thirdCloud, convexHull);
 	}
 
 	/**
@@ -368,44 +385,13 @@ public class QuickHull3D extends QuickHull {
 	 *            Liste von Punkten
 	 * @return der Punkt der am weitesten oberhalb der Ebene liegt
 	 */
-	protected Point getUppestPoint(Point left, Point right, Point far,
+	protected Point getMostDistantPoint(Point left, Point right, Point far,
 			Collection<Point> points) {
 		return points
 				.stream()
 				.max((a, b) -> (int) Math.signum(getDifferenceFromNormal(left,
 						right, far, a)
 						- getDifferenceFromNormal(left, right, far, b))).get();
-	}
-
-	/**
-	 * Bestimmt alle Punkte oberhalb einer Ebene
-	 * 
-	 * @param left
-	 *            der erste Punkt der Ebene
-	 * @param right
-	 *            der zweite Punkt der Ebene
-	 * @param far
-	 *            der dritte Punkt der Ebene
-	 * @param points
-	 *            die Punktmenge aus der die Punkte zu bestimmen sind
-	 * @return die Punkte oberhalb der Ebene
-	 */
-	protected Collection<Point> getAllPointsOver(Point left, Point right,
-			Point far, Collection<Point> points) {
-
-		LinkedList<Point> retVal = new LinkedList<Point>();
-
-		points.stream()
-				.filter(currPoint -> getDifferenceFromNormal(left, right, far,
-						currPoint) > 0)
-				.filter(currPoint -> currPoint.getOwner() == null
-						|| currPoint.getOwner().equals(points))
-				.forEach(currPoint -> {
-					retVal.add(currPoint);
-					currPoint.setOwner(retVal);
-				});
-
-		return retVal;
 	}
 
 	/**
@@ -424,7 +410,7 @@ public class QuickHull3D extends QuickHull {
 	 *            Punkt, dessen Abstand berechnet werden soll.
 	 * @return
 	 */
-	private double getDifferenceFromNormal(Point left, Point right, Point far,
+	protected double getDifferenceFromNormal(Point left, Point right, Point far,
 			Point x) {
 		// Ebenengleichung normale n = (q-p) x (r-p)
 

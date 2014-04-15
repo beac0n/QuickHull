@@ -36,7 +36,7 @@ public class QuickHull2DTest extends QuickHullTest {
 		pointList.add(d);
 
 		Collection<Point> currentBorderPoints = getBorderAndWriteToFile(
-				pointList, "2D" + outFilePre + "testPointsBestCase");
+				pointList, "2D" + outFilePre + "testPointsBestCase", true);
 
 		assertEquals(4, currentBorderPoints.size());
 		assertTrue(currentBorderPoints.contains(a));
@@ -50,7 +50,7 @@ public class QuickHull2DTest extends QuickHullTest {
 		List<Point> pointList = new LinkedList<Point>();
 		pointList = getRandomGaussianPoints(pointCap, false);
 		getBorderAndWriteToFile(pointList, "2D" + outFilePre
-				+ "testPointsRandom");
+				+ "testPointsRandom", true);
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class QuickHull2DTest extends QuickHullTest {
 		}
 
 		Collection<Point> border = getBorderAndWriteToFile(pointList, "2D"
-				+ outFilePre + "testPointsCircle");
+				+ outFilePre + "testPointsCircle", true);
 		assertEquals(pointList.size(), border.size());
 	}
 

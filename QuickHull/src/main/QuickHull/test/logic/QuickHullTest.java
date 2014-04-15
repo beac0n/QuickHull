@@ -22,7 +22,7 @@ public abstract class QuickHullTest {
 	private Color normalPointsColor = new Color(255, 0, 0);
 	private Color borderPointsColor = new Color(255, 255, 255);
 
-	protected int pointCap = 3_000_000;
+	protected int pointCap = 10_000;
 	protected int pointCapHalf = pointCap / 2;
 
 	protected String outFilePre = "_";
@@ -49,7 +49,13 @@ public abstract class QuickHullTest {
 	}
 
 	protected Collection<Point> getBorderAndWriteToFile(
-			Collection<Point> points, String filename)
+	Collection<Point> points, String filename)
+	throws FileNotFoundException {
+		return getBorderAndWriteToFile(points, filename, true);
+	}
+
+	protected Collection<Point> getBorderAndWriteToFile(
+			Collection<Point> points, String filename, boolean writeToFile)
 			throws FileNotFoundException {
 		QuickHull qh = createQuickHullObject();
 
@@ -67,6 +73,8 @@ public abstract class QuickHullTest {
 		long endTime = System.nanoTime();
 		double timeInMs = (endTime - startTime) / 1_000_000d;
 
+		if(writeToFile) {
+		
 		System.out.print("convex hull calculated, took " + timeInMs
 				+ " ms, now writing to " + filename + ".x3d... ");
 		Iterator<Point> iter = points.iterator();
@@ -96,7 +104,8 @@ public abstract class QuickHullTest {
 				x3dFileTail, borderPointsColor);
 
 		System.out.println("done");
-
+		}
+		
 		return border;
 	}
 

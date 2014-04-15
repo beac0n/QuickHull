@@ -9,7 +9,4 @@ public interface Point {
 	public double getY();
 
 	public double getZ();
-	
-	public Collection<Point> getOwner();
-	public void setOwner(Collection<Point> owner);
 }

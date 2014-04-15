@@ -1,6 +1,7 @@
 package main.QuickHull3D;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Stack;
 
 import main.QuickHull.Point;
@@ -30,7 +31,7 @@ public class QuickHull3DNoRecrusion extends QuickHull3D {
 		while(!stack.isEmpty()) {
 			curFrame = stack.pop();
 			Point curLeft = curFrame.getLeft();
-			Point currRight = curFrame.getRight();
+			Point curRight = curFrame.getRight();
 			Point curFar = curFrame.getFar();
 			Collection<Point> curPoints = curFrame.getPoints();			
 			
@@ -39,24 +40,30 @@ public class QuickHull3DNoRecrusion extends QuickHull3D {
 				continue;
 			}
 
-			Point uppest = getUppestPoint(curLeft, currRight, curFar, curPoints);
+			Point mdPoint = getMostDistantPoint(curLeft, curRight, curFar, curPoints);
 
-			convexHull.add(uppest);
-
-			Collection<Point> rightUpperList 
-			= getAllPointsOver(uppest, curFar, curLeft, curPoints);
-
-			Collection<Point> leftUpperList 
-			= getAllPointsOver(curLeft, currRight, uppest, curPoints);
-
-			Collection<Point> farUpperList 
-			= getAllPointsOver(currRight, curFar, uppest, curPoints);
+			convexHull.add(mdPoint);
 			
-			stack.push(new StackFrameQuickHull3D(currRight, curFar, uppest, farUpperList));
-			stack.push(new StackFrameQuickHull3D(curLeft, currRight, uppest, leftUpperList));
-			stack.push(new StackFrameQuickHull3D(uppest, curFar, curLeft, rightUpperList));
+			Collection<Point> firstCloud = new LinkedList<Point>();
+			Collection<Point> secondCloud = new LinkedList<Point>();
+			Collection<Point> thirdCloud = new LinkedList<Point>();
+			
+			curPoints.stream().forEach(curPoint -> 
+			{
+				if(getDifferenceFromNormal(mdPoint, curFar, curLeft, curPoint) > 0) {
+					firstCloud.add(curPoint);
+				}
+				else if(getDifferenceFromNormal(curLeft, curRight, mdPoint, curPoint) > 0) {
+					secondCloud.add(curPoint);
+				}
+				else if(getDifferenceFromNormal(curRight, curFar, mdPoint, curPoint) > 0) {
+					thirdCloud.add(curPoint);
+				}
+			});
+			
+			stack.push(new StackFrameQuickHull3D(curRight, curFar, mdPoint, thirdCloud));
+			stack.push(new StackFrameQuickHull3D(curLeft, curRight, mdPoint, secondCloud));
+			stack.push(new StackFrameQuickHull3D(mdPoint, curFar, curLeft, firstCloud));
 		}
-		
-
 	}
 }
