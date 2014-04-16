@@ -98,8 +98,10 @@ public class QuickHull3D extends QuickHull {
 		Point b = iter.next();
 		Point c = iter.next();		
 
-		Collection<Point> firstCloud = initCloud();
-		Collection<Point> secondCloud = initCloud();		
+		int cloudSize = points.size();
+		
+		Collection<Point> firstCloud = initCloud(cloudSize);
+		Collection<Point> secondCloud = initCloud(cloudSize);		
 		
 		points.stream().forEach(curPoint -> 
 		{
@@ -123,6 +125,10 @@ public class QuickHull3D extends QuickHull {
 	
 	private Collection<Point> initCloud() {
 		return new ArrayList<Point>();
+	}
+	
+	private Collection<Point> initCloud(int size) {
+		return new ArrayList<Point>(size);
 	}
 	
 	private Collection<Point> initCloud(Collection<Point> input) {
@@ -348,9 +354,11 @@ public class QuickHull3D extends QuickHull {
 		Point mdPoint = mdPointOptional.get();		
 		convexHull.add(mdPoint);
 
-		Collection<Point> firstCloud = initCloud();
-		Collection<Point> secondCloud = initCloud();
-		Collection<Point> thirdCloud = initCloud();
+		int cloudSize = points.size();
+		
+		Collection<Point> firstCloud = initCloud(cloudSize);
+		Collection<Point> secondCloud = initCloud(cloudSize);
+		Collection<Point> thirdCloud = initCloud(cloudSize);
 		
 		points.stream().forEach(curPoint -> 
 		{
