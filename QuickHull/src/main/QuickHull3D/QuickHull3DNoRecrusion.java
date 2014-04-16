@@ -2,6 +2,7 @@ package main.QuickHull3D;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Stack;
 
 import main.QuickHull.Point;
@@ -35,13 +36,10 @@ public class QuickHull3DNoRecrusion extends QuickHull3D {
 			Point curFar = curFrame.getFar();
 			Collection<Point> curPoints = curFrame.getPoints();			
 			
-			if (curPoints.size() < 4) {
-				convexHull.addAll(curPoints);
-				continue;
-			}
-
-			Point mdPoint = getMostDistantPoint(curLeft, curRight, curFar, curPoints);
-
+			Optional<Point> mdPointOptional = getMostDistantPoint(curLeft, curRight, curFar, curPoints);	
+			if(!mdPointOptional.isPresent()) continue;
+			
+			Point mdPoint = mdPointOptional.get();
 			convexHull.add(mdPoint);
 			
 			Collection<Point> firstCloud = new LinkedList<Point>();

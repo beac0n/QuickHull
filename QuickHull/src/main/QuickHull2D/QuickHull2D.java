@@ -176,8 +176,8 @@ public class QuickHull2D extends QuickHull {
 	protected Point getUppestPoint(Point left, Point right, List<Point> points) {
 		return points
 				.stream()
-				.max((a, b) -> (int) Math.signum(getDifferenceFromNormal(left,
-						right, a) - getDifferenceFromNormal(left, right, b)))
+				.max((a, b) -> Double.compare(getDifferenceFromNormal(left,
+						right, a) , getDifferenceFromNormal(left, right, b)))
 				.get();
 	}
 }

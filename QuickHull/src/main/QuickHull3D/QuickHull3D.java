@@ -118,7 +118,7 @@ public class QuickHull3D extends QuickHull {
 	}
 	
 	private Collection<Point> initConvexHull(Collection<Point> cloud) {
-		return new HashSet<Point>(cloud.size()*2);
+		return new ArrayList<Point>(cloud.size());
 	}
 	
 	private Collection<Point> initCloud() {
@@ -189,8 +189,8 @@ public class QuickHull3D extends QuickHull {
 
 		TwoPointDistance maxDistance = distances
 				.stream()
-				.max((a, b) -> (int) Math.signum(a.generateDistance()
-						- b.generateDistance())).get();
+				.max((a, b) -> Double.compare(a.generateDistance()
+						, b.generateDistance())).get();
 
 		Point maxfirst = maxDistance.getB();
 		Point maxsecond = maxDistance.getA();
@@ -230,8 +230,8 @@ public class QuickHull3D extends QuickHull {
 		}
 
 		return distances.stream().max(
-				(a, b) -> (int) Math.signum(a.generateDistance()
-						- b.generateDistance()));
+				(a, b) -> Double.compare(a.generateDistance()
+						, b.generateDistance()));
 	}
 
 	private TwoPointDistance getMaxDistanceOf(Collection<Point> sideA,
@@ -247,8 +247,8 @@ public class QuickHull3D extends QuickHull {
 
 		return distances
 				.stream()
-				.max((a, b) -> (int) Math.signum(a.generateDistance()
-						- b.generateDistance())).get();
+				.max((a, b) -> Double.compare(a.generateDistance()
+						, b.generateDistance())).get();
 	}
 
 	private Collection<Point> getAllEqualX(Collection<Point> points, Point left) {
@@ -287,8 +287,8 @@ public class QuickHull3D extends QuickHull {
 
 		return points
 				.stream()
-				.max((a, b) -> (int) Math.signum(getDistanceFromLine(u, p, a)
-						- getDistanceFromLine(u, p, b))).get();
+				.max((a, b) -> Double.compare(getDistanceFromLine(u, p, a)
+						, getDistanceFromLine(u, p, b))).get();
 	}
 
 	/**
@@ -342,12 +342,10 @@ public class QuickHull3D extends QuickHull {
 
 		// printPointsAndShape(left, right, far, points);
 
-		if (points.size() < 4) {
-			convexHull.addAll(points);
-			return;
-		}
-
-		Point mdPoint = getMostDistantPoint(left, right, far, points);
+		Optional<Point> mdPointOptional = getMostDistantPoint(left, right, far, points);
+		if(!mdPointOptional.isPresent()) return;
+		
+		Point mdPoint = mdPointOptional.get();		
 		convexHull.add(mdPoint);
 
 		Collection<Point> firstCloud = initCloud();
@@ -385,13 +383,14 @@ public class QuickHull3D extends QuickHull {
 	 *            Liste von Punkten
 	 * @return der Punkt der am weitesten oberhalb der Ebene liegt
 	 */
-	protected Point getMostDistantPoint(Point left, Point right, Point far,
+	protected Optional<Point> getMostDistantPoint(Point left, Point right, Point far,
 			Collection<Point> points) {
+		
 		return points
-				.stream()
-				.max((a, b) -> (int) Math.signum(getDifferenceFromNormal(left,
-						right, far, a)
-						- getDifferenceFromNormal(left, right, far, b))).get();
+				.stream().filter(a -> !a.equals(left) && !a.equals(right) && !a.equals(far))
+				.max((a, b) -> Double.compare(
+						getDifferenceFromNormal(left, right, far, a), 
+						getDifferenceFromNormal(left, right, far, b)));
 	}
 
 	/**
