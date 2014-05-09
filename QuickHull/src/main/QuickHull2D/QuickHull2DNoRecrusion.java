@@ -1,7 +1,6 @@
 package main.QuickHull2D;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Stack;
 
 import main.QuickHull.Point;

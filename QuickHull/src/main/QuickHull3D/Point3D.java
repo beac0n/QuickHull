@@ -1,7 +1,5 @@
 package main.QuickHull3D;
 
-import java.util.Collection;
-
 import main.QuickHull.Point;
 
 /**

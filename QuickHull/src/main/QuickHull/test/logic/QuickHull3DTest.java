@@ -7,18 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import main.QuickHull.Point;
 import main.QuickHull.QuickHull;
 import main.QuickHull3D.Point3D;
 import main.QuickHull3D.QuickHull3D;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class QuickHull3DTest extends QuickHullTest {

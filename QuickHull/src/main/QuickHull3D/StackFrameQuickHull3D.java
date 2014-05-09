@@ -1,8 +1,6 @@
 package main.QuickHull3D;
 
 import java.util.Collection;
-import java.util.Optional;
-
 import main.QuickHull.Point;
 
 public class StackFrameQuickHull3D {

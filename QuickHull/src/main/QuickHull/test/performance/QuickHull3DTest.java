@@ -2,12 +2,9 @@ package main.QuickHull.test.performance;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-
 import main.QuickHull.Point;
 import main.QuickHull.QuickHull;
 import main.QuickHull3D.Point3D;
@@ -15,9 +12,7 @@ import main.QuickHull3D.QuickHull3D;
 
 import org.junit.Test;
 
-public class QuickHull3DTest extends QuickHullTest {
-
-	
+public class QuickHull3DTest extends QuickHullTest {	
 	
 	@Test
 	public void testPointsBestCasePerformance() throws IOException {
@@ -73,9 +68,7 @@ public class QuickHull3DTest extends QuickHullTest {
 			FileNotFoundException {
 		System.out.println("=== testPointsSpherePerformance ===");
 		HashSet<Point> pointList = new HashSet<Point>();
-
-		Random rand = new Random();
-
+		
 		for (int i = 1000; i < pointCap; i *= 2) {
 			
 			pointList = getRandomSphereGaussianPoints(i);

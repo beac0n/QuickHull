@@ -1,7 +1,5 @@
 package main.QuickHull;
 
-import java.util.Collection;
-
 public interface Point {
 
 	public double getX();
